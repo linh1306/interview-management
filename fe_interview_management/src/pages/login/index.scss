@@ -1,0 +1,55 @@
+.login-container {
+  background: url("./assets/background.svg") center;
+  background-size: cover;
+}
+
+.input {
+  border: none !important;
+  outline: none !important;
+  border-bottom: 2px solid !important;
+
+  &:hover {
+    outline: none;
+  }
+}
+
+.button-submit {
+  background: #4b6cb7;
+  background: -webkit-linear-gradient(to right, #344c8c, #557cd7);
+  background: linear-gradient(to right, #344c8c, #557cd7);
+  color: white;
+  transition: 0.3s;
+}
+
+.ant-input-affix-wrapper.css-dev-only-do-not-override-98ntnt.ant-input-outlined.ant-input-password,
+.ant-input.css-dev-only-do-not-override-98ntnt.ant-input-outlined,
+.ant-input-affix-wrapper.css-dev-only-do-not-override-98ntnt.ant-input-outlined {
+  &:focus, &:focus-within {
+    box-shadow: none !important;
+  }
+}
+
+.ant-input-affix-wrapper .css-dev-only-do-not-override-98ntnt .ant-input-outlined .ant-input-status-error {
+  border: none !important;
+  border-bottom: 1px solid !important;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.form-container {
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+.slide-in {
+  animation-name: slideIn;
+}

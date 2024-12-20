@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kết Quả Phỏng Vấn</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9fafb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        background-color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 500px;
+        text-align: justify;
+        line-height: 1.6;
+      }
+      .title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+      .success {
+        color: #27ae60;
+      }
+      .failure {
+        color: #c0392b;
+      }
+      .message {
+        font-size: 18px;
+        color: #555;
+        margin-bottom: 20px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+      .btn-success {
+        background-color: #27ae60;
+      }
+      .btn-failure {
+        background-color: #c0392b;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Chọn một trong hai khối nội dung dưới đây -->
+
+      <!-- Thông báo trúng tuyển -->
+      <!-- <div class="title success">Chúc mừng bạn đã trúng tuyển!</div> -->
+      <div class="message">
+        Chúc mừng bạn đã vượt qua buổi phỏng vấn đầy thử thách! <br />
+        Chúng tôi rất vui mừng thông báo rằng bạn đã được chọn gia nhập đội ngũ
+        của chúng tôi. <br />
+      </div>
+
+      <!-- Thông báo trượt -->
+
+      <!-- <div class="title failure">Rất tiếc, bạn chưa trúng tuyển</div> -->
+      <div class="message">
+        Thân gửi {{full_name}}, Thay mặt cho Công ty, bộ phận tuyển dụng xin
+        được gửi tới {{full_name}} lời cảm ơn chân thành vì đã quan tâm đến công
+        ty chúng tôi. <br />
+        Qua buổi phỏng vấn, chúng tôi đánh giá rất cao năng lực và khả năng phát
+        triển của bạn. Tuy nhiên, theo quy trình tuyển dụng và yêu cầu của công
+        việc, chúng tôi thành thật xin lỗi vì chưa thể đồng hành cùng bạn trong
+        cơ hội lần này. Chúng tôi vẫn sẽ có kế hoạch tiếp tục tuyển dụng các vị
+        trí khác trong thời gian tới vì thế rất mong sẽ tiếp tục nhận được sự
+        quan tâm và ủng hộ từ bạn. <br />
+        Về hồ sơ ứng tuyển, chúng tôi xin phép được xử lý theo quy trình bảo mật
+        thông tin của Công ty, tuyệt đối không chuyển thông tin cho bên thứ ba
+        trong bất kỳ trường hợp nào. Một lần nữa xin cảm ơn bạn đã dành thời
+        gian cho chúng tôi. Chúc bạn và gia đình sức khỏe và bình an. Mong được
+        đồng hành với bạn trong thời gian gần nhất.
+      </div>
+    </div>
+  </body>
+</html>

@@ -28,14 +28,32 @@ export const ModalAddUser = (props: any) => {
         layout="horizontal"
         className="w-full mt-10"
         onFinish={async (data) => {
+          console.log('data: ', data)
+          const formatDob = (dobValue: any) => {
+            if (!dobValue) return null;
+            // Nếu là Moment object
+            if (dobValue._isAMomentObject) {
+              return dobValue.format("YYYY-MM-DD");
+            }
+            // Nếu là Date string
+            return moment(dobValue).format("YYYY-MM-DD");
+          };
+
           if (initialValues) {
-            const payload = { ...data, dob: data.dob.format("YYYY-MM-DD") };
+            const payload = {
+              ...data,
+              dob: formatDob(data.dob)
+            };
+
             await dispatch(updateUser({ payload, id: initialValues.id }));
             handleClose();
-            // @ts-ignore
             dispatch(getUsers());
           } else {
-            const payload = { ...data, dob: data.dob.format("YYYY-MM-DD") };
+            const payload = {
+              ...data,
+              dob: formatDob(data.dob)
+            };
+
             await dispatch(createUser(payload));
             handleClose();
           }
@@ -98,8 +116,8 @@ export const ModalAddUser = (props: any) => {
             className="w-1/2 mr-5"
           >
             <DatePicker
-                className="w-full"
-                disabledDate={(current) => current && current > moment().startOf('day')}
+              className="w-full"
+              disabledDate={(current) => current && current > moment().startOf('day')}
             />
           </Form.Item>
           <Form.Item
@@ -149,14 +167,14 @@ export const ModalAddUser = (props: any) => {
           </Form.Item>
         </div>
         <Form.Item
-            name="note"
-            label="Note"
-            className="w-full"
-            labelCol={{ span: 3 }}
+          name="note"
+          label="Note"
+          className="w-full"
+          labelCol={{ span: 3 }}
         >
           <TextArea
-              allowClear
-              placeholder={"Enter note"}
+            allowClear
+            placeholder={"Enter note"}
           />
         </Form.Item>
         <div className="w-full flex justify-end gap-x-5 mt-5">

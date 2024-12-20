@@ -1,12 +1,15 @@
 import Helmet from "@/components/Helmet.tsx";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Select, message, App } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import GenericTable from "@/components/Table";
 import { useEffect, useState } from "react";
 import { ModalAddRequest } from "@/components/modal/ModalAddRequest.tsx";
 import { useAppDispatch, useAppSelector, useAuth } from "@/redux/hooks.ts";
+import { createRequest, getRequests, updateRequest } from "@/redux/features/requestSlice.ts";
 import moment from "moment";
 import dayjs from "dayjs";
+import axios from "axios";
+
 
 // Constants for select options
 const RequestStatus = {
@@ -30,59 +33,88 @@ const WorkplaceOptions = [
     'Da Nang'
 ];
 
-const columns = [
-    {
-        title: 'Request ID',
-        dataIndex: 'request_id',
-        key: 'request_id',
-    },
-    {
-        title: 'Position',
-        dataIndex: 'position',
-        key: 'position',
-    },
-    {
-        title: 'Quantity',
-        dataIndex: 'quantity',
-        key: 'quantity',
-    },
-    {
-        title: 'Department',
-        dataIndex: 'department',
-        key: 'department',
-    },
-    {
-        title: 'Level',
-        dataIndex: 'level',
-        key: 'level',
-        render: (levels: string[]) => levels.join(', ')
-    },
-    {
-        title: 'Workplace',
-        dataIndex: 'workplace',
-        key: 'workplace',
-    },
-    {
-        title: 'Recruitment Period',
-        key: 'recruitment_period',
-        render: (record: any) => (
-            `${moment(record.start_date).format('DD/MM/YYYY')} - 
-             ${moment(record.end_date).format('DD/MM/YYYY')}`
-        )
-    },
-    {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
-    }
-];
+
 
 export const RequestPage = () => {
     const [selectedStatus, setSelectedStatus] = useState<any>(undefined);
     const [selectedRequest, setSelectedRequest] = useState<any>(undefined);
     const dispatch = useAppDispatch();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const requests = useAppSelector((state) => state.request?.requests || []);
+    const [requests, setRequests] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const { message: messageApi } = App.useApp();
+    const columns = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: 'Position',
+            dataIndex: 'position',
+            key: 'position',
+        },
+        {
+            title: 'Quantity',
+            dataIndex: 'quantity',
+            key: 'quantity',
+        },
+        {
+            title: 'Department',
+            dataIndex: 'department',
+            key: 'department',
+        },
+        {
+            title: 'Level',
+            dataIndex: 'level',
+            key: 'level',
+            render: (levels: string[]) => levels.join(', ')
+        },
+        {
+            title: 'Workplace',
+            dataIndex: 'workplace',
+            key: 'workplace',
+        },
+        {
+            title: 'Recruitment Period',
+            key: 'recruitment_period',
+            render: (record: any) => (
+                `${moment(record.start_date).format('DD/MM/YYYY')} - 
+                 ${moment(record.end_date).format('DD/MM/YYYY')}`
+            )
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string, record: any) => (
+                <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded-full ${getStatusColor(status)}`}>
+                        {status}
+                    </span>
+                    {status === RequestStatus.PENDING &&
+                        (user?.role === 'Admin' || user?.role === 'HR') && (
+                            <Select
+                                size="small"
+                                style={{ width: 120 }}
+                                placeholder="Change status"
+                                onChange={(value) => handleStatusChange(record.id, value)}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Select.Option value={RequestStatus.APPROVED}>Approve</Select.Option>
+                                <Select.Option value={RequestStatus.REJECTED}>Reject</Select.Option>
+                            </Select>
+                        )}
+                </div>
+            ),
+        },
+        {
+            title: 'Created By',
+            dataIndex: ['created_by', 'full_name'], // Nested access
+            key: 'created_by',
+        },
+
+    ];
     const { role, user } = useAuth();
 
     const statusOptions = Object.entries(RequestStatus).map(([key, value]) => ({
@@ -90,15 +122,52 @@ export const RequestPage = () => {
         value: value
     }));
 
+    const fetchRequests = async (search?: string) => {
+        try {
+            setLoading(true);
+            const response = await axios.get('http://localhost:8080/api/v1/request', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Accept': 'application/json'
+                },
+                params: {
+                    search,
+                    filter: selectedStatus ? JSON.stringify({ status: selectedStatus }) : undefined
+                }
+            });
+            setRequests(response.data.data.results);
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     useEffect(() => {
-        // You'll need to create and dispatch a getRequests action
-        // dispatch(getRequests({}));
+        fetchRequests();
     }, [selectedStatus]);
+
+
+    useEffect(() => {
+        dispatch(getRequests({}));
+    }, [dispatch, selectedStatus]);
+
 
     const handleClose = () => {
         setSelectedRequest(undefined);
         setIsModalVisible(false);
-    }
+        fetchRequests(); // Refresh data after modal closes
+    };
+
+    const handleSearch = (search: string) => {
+        fetchRequests(search);
+    };
+
+
+    useEffect(() => {
+        handleSearch('');
+    }, [selectedStatus]);
 
     // Function to generate Request ID
     const generateRequestId = (workplace: string, position: string, currentCount: number) => {
@@ -106,36 +175,78 @@ export const RequestPage = () => {
         const formattedCount = String(currentCount).padStart(2, '0');
         return `${prefix}-${position}-${formattedCount}`;
     };
+    const handleStatusChange = async (id: number, newStatus: string) => {
+        try {
+            setLoading(true);
+            await axios.patch(
+                `http://localhost:8080/api/v1/request/${id}/status`,
+                { status: newStatus },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
 
-    const handleCreateRequest = (values: any) => {
-        // Get current count of requests for this position and workplace
-        const currentCount = requests.filter(
-            (req: any) =>
-                req.position === values.position &&
-                req.workplace === values.workplace
-        ).length + 1;
+            // Update local state trước khi gọi fetch
+            setRequests(prevRequests =>
+                prevRequests.map(request =>
+                    request.id === id
+                        ? { ...request, status: newStatus }
+                        : request
+                )
+            );
 
-        const requestData = {
-            ...values,
-            request_id: generateRequestId(values.workplace, values.position, currentCount),
-            department: user?.department, // Default to user's department
-            created_by: user?.id,
-            created_date: new Date(),
-            status: RequestStatus.PENDING
-        };
-
-        // dispatch(createRequest(requestData));
+            // Fetch lại data để đồng bộ
+            await fetchRequests();
+        } catch (error) {
+            console.error('Error updating request status:', error);
+            messageApi.error('Failed to update request status');
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case RequestStatus.PENDING:
+                return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+            case RequestStatus.APPROVED:
+                return 'bg-green-100 text-green-800 border border-green-200';
+            case RequestStatus.REJECTED:
+                return 'bg-red-100 text-red-800 border border-red-200';
+            default:
+                return '';
+        }
+    };
+
+
+    const handleCreateRequest = async (values: any) => {
+        try {
+            await axios.post('http://localhost:8080/api/v1/request', values, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            fetchRequests(); // Refresh data after creation
+            handleClose();
+        } catch (error) {
+            console.error('Error creating request:', error);
+        }
+    };
+
 
     return (
         <div className="p-10 bg-white h-full rounded">
             <Helmet title="Manage Recruitment Requests" />
-            {/* You'll need to create a ModalAddRequest component with the specified fields */}
             <ModalAddRequest
                 isOpen={isModalVisible}
                 handleClose={handleClose}
                 initialValues={selectedRequest}
                 key={selectedRequest}
+                onSubmit={handleCreateRequest}
             />
             <div className="w-full flex justify-between items-center">
                 <div className="flex w-9/12">
@@ -151,9 +262,7 @@ export const RequestPage = () => {
                     <Input.Search
                         className="w-1/3"
                         placeholder="Search by position or ID"
-                        onSearch={async (search) => {
-                            // dispatch(getRequests({ filter: JSON.stringify({ status: selectedStatus }), search }));
-                        }}
+                        onSearch={handleSearch}
                         size="large"
                     />
                 </div>
@@ -169,9 +278,18 @@ export const RequestPage = () => {
                 <GenericTable
                     columns={columns}
                     data={requests}
+                    loading={loading}
                     onDeleteItem={async (record) => {
-                        // await dispatch(deleteRequest(record.id));
-                        // await dispatch(getRequests({}));
+                        try {
+                            await axios.delete(`http://localhost:8080/api/v1/request/${record.id}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                }
+                            });
+                            fetchRequests();
+                        } catch (error) {
+                            console.error('Error deleting request:', error);
+                        }
                     }}
                     onEditItem={(record) => {
                         setSelectedRequest({
@@ -184,7 +302,7 @@ export const RequestPage = () => {
                 />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default RequestPage;

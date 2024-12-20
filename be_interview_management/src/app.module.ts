@@ -21,6 +21,7 @@ import { JobModule } from './job/job.module';
 import { CandidateModule } from './candidate/candidate.module';
 import { InterviewScheduleModule } from './interview_schedule/interview_schedule.module';
 import { OfferModule } from './offer/offer.module';
+import { RequestModule } from './request/request.module';
 import { StatiticModule } from './statitic/statitic.module';
 
 const appModule = [AuthModule, UserModule, RoleModule, MailerModule];
@@ -39,6 +40,7 @@ const baseModule = [LoggerModule, UploadFileModule];
     InterviewScheduleModule,
     OfferModule,
     StatiticModule,
+    RequestModule
   ],
   controllers: [],
   providers: [],

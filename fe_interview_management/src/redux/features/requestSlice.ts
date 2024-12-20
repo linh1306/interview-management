@@ -86,6 +86,7 @@ const requestSlice = createSlice({
             })
             .addCase(getRequests.fulfilled, (state, action) => {
                 state.requests = action.payload.results;
+                state.metadata = action.payload.data.metadata;
             })
             .addMatcher(
                 (action) =>

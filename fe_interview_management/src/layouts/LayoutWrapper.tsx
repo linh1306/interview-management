@@ -44,7 +44,8 @@ function LayoutWrapper() {
     const [cr, errorMsg] = canNavigateToRoute({
       route: location.pathname,
       validUser: !!user,
-      isAdmin: isAdmin
+      isAdmin: isAdmin,
+      role: user?.role
     });
 
     if (errorMsg) {
@@ -59,7 +60,7 @@ function LayoutWrapper() {
     if (["/register", "/login"].includes(location.pathname) && isAuth) {
       navigate('/')
     }
-  }, [location]);
+  }, [location, user?.role]);
 
   const active = useMemo(() => {
     return location.pathname
@@ -70,21 +71,41 @@ function LayoutWrapper() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   // Define menu items with Link wrapped around the label
-  const [items, setItems] = useState<MenuItem[]>([
-    getItem(<Link to="/">Dashboard</Link>, '/', <HomeOutlined />),
-    getItem(<Link to="/candidate">Candidate</Link>, '/candidate', <SearchOutlined />),
-    getItem(<Link to="/job">Job</Link>, '/job', <CarryOutFilled />),
-    getItem(<Link to="/interview">Interview</Link>, '/interview', <DingtalkOutlined />),
-    getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />),
-    getItem(<Link to="/request">Request</Link>, '/request', <CarryOutFilled />),
+  const getMenuItems = (role: string) => {
+    // Menu items cơ bản cho tất cả role
+    const baseItems = [
+      getItem(<Link to="/">Dashboard</Link>, '/', <HomeOutlined />),
+      getItem(<Link to="/candidate">Candidate</Link>, '/candidate', <SearchOutlined />),
+      getItem(<Link to="/job">Job</Link>, '/job', <CarryOutFilled />),
+      getItem(<Link to="/interview">Interview</Link>, '/interview', <DingtalkOutlined />),
+      getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />),
+    ];
 
-  ])
+    // Thêm Request menu cho role được phép
+    if (role !== 'Interviewer') {
+      baseItems.push(
+        getItem(<Link to="/request">Request</Link>, '/request', <CarryOutFilled />)
+      );
+    }
+
+    // Thêm User menu cho Admin
+    if (role === 'Admin') {
+      baseItems.push(
+        getItem(<Link to="/user">User</Link>, '/user/permissions', <UserOutlined />)
+      );
+    }
+
+    return baseItems;
+  };
+  const [items, setItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
-    if (isAdmin) {
-      setItems(prev => [...prev, getItem(<Link to="/user">User</Link>, '/user/permissions', <UserOutlined />)])
+    if (user && user.role) {
+      const menuItems = getMenuItems(user.role);
+      setItems(menuItems);
     }
-  }, [isAdmin, isAuth]);
+  }, [user?.role]);
+
 
   const ModalChangePassword = () => {
     return (

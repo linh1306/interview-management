@@ -63,8 +63,7 @@ export const ModalAddRequest = (props: any) => {
                         department: user?.role === UserRole.Admin ? data.department : user?.department,
                         start_date: data.recruitment_period[0].format("YYYY-MM-DD"),
                         end_date: data.recruitment_period[1].format("YYYY-MM-DD"),
-                        status: 'Pending',
-                        created_by: user?.id
+                        status: 'Pending'
                     };
                     delete payload.recruitment_period;
 

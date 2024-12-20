@@ -76,6 +76,7 @@ function LayoutWrapper() {
     getItem(<Link to="/job">Job</Link>, '/job', <CarryOutFilled />),
     getItem(<Link to="/interview">Interview</Link>, '/interview', <DingtalkOutlined />),
     getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />),
+    getItem(<Link to="/request">Request</Link>, '/request', <CarryOutFilled />),
 
   ])
 

@@ -1,19 +1,13 @@
 // @ts-nocheck
 import { DatePicker, Form, Input, InputNumber, Modal, Select, Upload, UploadProps } from "antd";
 import { CandidateStatus, Gender, HighestLevelCandidate, JobStatus, OfferPosition, UserDepartment, UserRole } from "@/configs/constants.tsx";
-import { DownloadOutlined, EyeOutlined, InboxOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EyeOutlined, InboxOutlined, UserOutlined, PhoneOutlined, MailOutlined, HomeOutlined, BookOutlined, TrophyOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { Skill } from "@/interfaces/job.interface.ts";
 import { createCandidate, getCandidates, updateCandidate } from "@/redux/features/candidateSlice.ts";
 import { useState } from "react";
 import moment from "moment/moment";
 const genderOptions = Object.entries(Gender).map(([key, value]) => ({ label: value, value: key }));
-const { Dragger } = Upload;
-const dummyRequest = ({ file, onSuccess }) => {
-  setTimeout(() => {
-    onSuccess("ok");
-  }, 0);
-};
 export const ModalAddCandidate = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
   const dispatch = useAppDispatch();
@@ -26,23 +20,14 @@ export const ModalAddCandidate = (props: any) => {
 
   const user = useAppSelector((state) => state.auth.currentUser)
 
-  const uploadProps: UploadProps = {
-    name: 'file',
-    accept: ".pdf,.doc,.docx",
-    customRequest: dummyRequest,
-    onChange: info => {
-      setFileList(info.fileList);
-    }
-  };
-
   const selectAfter = (
-      <Select style={{ width: 60 }} options={[{
-        value: 'Year(s)',
-        label: '$'
-      }
-      ]}>
+    <Select style={{ width: 60 }} options={[{
+      value: 'Year(s)',
+      label: '$'
+    }
+    ]}>
 
-      </Select>
+    </Select>
   );
   return (
     <Modal
@@ -88,7 +73,7 @@ export const ModalAddCandidate = (props: any) => {
           await dispatch(getCandidates());
           handleClose();
         }}
-        initialValues={initialValues || {note: ''}}
+        initialValues={initialValues || { note: '' }}
         labelCol={{ span: 6 }}
         key={initialValues}
       >
@@ -126,8 +111,8 @@ export const ModalAddCandidate = (props: any) => {
             rules={[{ required: true, message: 'Please enter dob' }]}
           >
             <DatePicker
-                className="w-full"
-                disabledDate={(current) => current && current > moment().startOf('day')}
+              className="w-full"
+              disabledDate={(current) => current && current > moment().startOf('day')}
             />
           </Form.Item>
           <Form.Item
@@ -164,21 +149,6 @@ export const ModalAddCandidate = (props: any) => {
           </Form.Item>
         </div>
         <h3 className="font-semibold mb-5">II. Professional Information</h3>
-        <Form.Item
-          name="attach_file"
-          className="w-full"
-          rules={[{ required: true, message: 'Please upload CV' }]}
-        >
-          <Dragger {...uploadProps} maxCount={1}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">Click or drag file to this area to upload</p>
-            <p className="ant-upload-hint">
-              Support for a single file. Type: pdf, doc, docx. Max file size: 5MB
-            </p>
-          </Dragger>
-        </Form.Item>
         {
           initialValues && initialValues.attach_file && fileList.length === 0 &&
           <div className="mb-5 translate-y-[-10px] text-blue-400 justify-between flex w-full">

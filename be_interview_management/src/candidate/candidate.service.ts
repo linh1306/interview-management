@@ -21,6 +21,31 @@ export class CandidateService extends BaseService<Candidate> {
   }
 
   async create(payload: CreateCandidateDto, user: User) {
+    const existingEmail = await this.repository.findOne({
+      where: {
+        email: payload.email,
+        deleted: null // Chỉ check với các record chưa bị xóa
+      }
+    });
+    if (existingEmail) {
+      throw new BadRequest({
+        message: 'Email already exists',
+      });
+    }
+
+    // Kiểm tra phone đã tồn tại
+    const existingPhone = await this.repository.findOne({
+      where: {
+        phone: payload.phone,
+        deleted: null
+      }
+    });
+    if (existingPhone) {
+      throw new BadRequest({
+        message: 'Phone number already exists',
+      });
+    }
+
     return this.repository.save({
       ...payload,
       attach_file: payload.file,

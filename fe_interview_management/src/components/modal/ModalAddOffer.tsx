@@ -1,9 +1,10 @@
 // @ts-nocheck
-import {DatePicker, Form, Input, InputNumber, Modal, Select} from "antd";
+import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { useEffect, useMemo, useState } from "react";
 import { OfferLevel, OfferPosition, OfferStatus, OfferType, UserDepartment } from "@/configs/constants.tsx";
 import { createOffer, getOffers, updateOffer } from "@/redux/features/offerSlice.ts";
+import { useAuth } from "@/redux/hooks.ts";
 import moment from "moment";
 
 export const ModalAddOffer = (props: any) => {
@@ -17,14 +18,40 @@ export const ModalAddOffer = (props: any) => {
   const statusOptions = Object.values(OfferStatus).map((status) => ({ label: status, value: status }));
   const interviewOptions = useMemo(() => interviews.map((interview) => ({ label: interview.title, value: interview.id })), [interviews]);
   const levelOptions = Object.entries(OfferLevel).map(([key, value]) => ({ label: value, value: value }));
-  const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({ label: value, value: value }));
+  const { user } = useAuth();
+  const departmentOptions = useMemo(() => {
+    if (user?.role === 'Manager') {
+      // Nếu là Manager chỉ hiện phòng ban của họ
+      return [{ label: user.department, value: user.department }];
+    }
+    // Nếu không phải Manager thì hiện tất cả phòng ban
+    return Object.entries(UserDepartment).map(([key, value]) => ({
+      label: value,
+      value: value
+    }));
+  }, [user]);
+
   const offerTypeOptions = Object.entries(OfferType).map(([key, value]) => ({ label: value, value: value }));
   const dispatch = useAppDispatch();
   const [selectedInterview, setSelectedInterview] = useState<any>(undefined);
+  const approverOptions = useMemo(() => {
+    const hrUsers = users.filter(u => u.role === 'HR');
+
+    // Chỉ hiện current user và HR users
+    return [
+      { label: user.username, value: user.id },
+      ...hrUsers.map(hrUser => ({
+        label: hrUser.username,
+        value: hrUser.id
+      }))
+    ];
+  }, [users, user]);
+
   useEffect(() => {
     console.log(selectedInterview);
   }, [selectedInterview]);
   return (
+    console.log('departmentOptions: ', departmentOptions),
     <Modal
       title={initialValues ? "EDIT OFFER" : "ADD OFFER"}
       open={isOpen}
@@ -50,7 +77,7 @@ export const ModalAddOffer = (props: any) => {
           await dispatch(getOffers({}));
           handleClose();
         }}
-        initialValues={initialValues || {currency: 'USD'}}
+        initialValues={initialValues || { currency: 'USD' }}
         labelCol={{ span: 6 }}
         key={initialValues}
       >
@@ -104,9 +131,11 @@ export const ModalAddOffer = (props: any) => {
             name="manager_id"
             label="Approved by:"
             className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please enter interviews' }]}
+            rules={[{ required: true, message: 'Please enter approver' }]}
           >
-            <Select options={userOptions} />
+            <Select
+              options={approverOptions}
+            />
           </Form.Item>
           <Form.Item
             name="status"
@@ -145,8 +174,8 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter time' }]}
           >
             <DatePicker
-                className="w-full"
-                disabledDate={(current) => current && current < moment().startOf('day')}
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
             />
           </Form.Item>
           <Form.Item
@@ -156,8 +185,8 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter time' }]}
           >
             <DatePicker
-                className="w-full"
-                disabledDate={(current) => current && current < moment().startOf('day')}
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
             />
           </Form.Item>
         </div>
@@ -169,30 +198,30 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter salary' }]}
           >
             <InputNumber
-                addonAfter={
-                  <Form.Item name="currency" noStyle>
-                    {<Select style={{ width: 60 }} options={[{
-                      value: 'USD',
-                      label: '$'
-                    },
-                      {
-                        value: 'EUR',
-                        label: '€'
-                      },
-                      {
-                        value: 'GBP',
-                        label: '£'
-                      },
-                      {
-                        value: 'CNY',
-                        label: '¥'
-                      }]}>
-                    </Select>}
-                  </Form.Item>
-                }
-                step={100}
-                className="w-full"
-                placeholder={"Enter salary from"}
+              addonAfter={
+                <Form.Item name="currency" noStyle>
+                  {<Select style={{ width: 60 }} options={[{
+                    value: 'USD',
+                    label: '$'
+                  },
+                  {
+                    value: 'EUR',
+                    label: '€'
+                  },
+                  {
+                    value: 'GBP',
+                    label: '£'
+                  },
+                  {
+                    value: 'CNY',
+                    label: '¥'
+                  }]}>
+                  </Select>}
+                </Form.Item>
+              }
+              step={100}
+              className="w-full"
+              placeholder={"Enter salary from"}
             />
           </Form.Item>
           <Form.Item

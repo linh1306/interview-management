@@ -40,7 +40,7 @@ export class CandidateController {
     @UploadedFile() file: Express.Multer.File,
     @GetUser() user: User,
   ) {
-    const fileName = await this.uploadService.uploadFile(file);
+    const fileName = file ? await this.uploadService.uploadFile(file) : null;
     return this.candidateService.create({ ...payload, file: fileName }, user);
   }
 

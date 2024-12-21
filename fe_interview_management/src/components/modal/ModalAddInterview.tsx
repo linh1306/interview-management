@@ -11,7 +11,14 @@ export const ModalAddInterview = (props: any) => {
   const candidates = useAppSelector((state) => state.candidate.candidates);
   const users = useAppSelector((state) => state.user.users);
   const userOptions = useMemo(() => users?.filter(it => it.role !== "HR").map((user) => ({ label: user.username, value: user.id })), [users]);
-  const candidateOptions = useMemo(() => candidates?.filter(it => it.status === 'Open').map((candidate) => ({ label: candidate.full_name, value: candidate.id })), [candidates]);
+  // const candidateOptions = useMemo(() => candidates?.filter(it => it.status === 'Open').map((candidate) => ({ label: candidate.full_name, value: candidate.id })), [candidates]);
+  const candidateOptions = useMemo(() => candidates?.map((candidate) => ({
+    label: `${candidate.full_name} (${candidate.email})`,
+    value: candidate.id
+  })), [candidates]);
+
+
+
   const jobOptions = useMemo(() => jobs.map((job) => ({ label: job.title, value: job.id })), [jobs]);
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
   const statusOptions = Object.values(InterviewStatus).map((status) => ({ label: status, value: status }));
@@ -76,7 +83,15 @@ export const ModalAddInterview = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter candidate name' }]}
           >
-            <Select options={candidateOptions} />
+            <Select
+              options={candidateOptions}
+              placeholder="Select candidate"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              notFoundContent="No candidate found"
+            />
           </Form.Item>
           <Form.Item
             name="position"
@@ -116,8 +131,8 @@ export const ModalAddInterview = (props: any) => {
           rules={[{ required: true, message: 'Please enter date' }]}
         >
           <DatePicker
-              className="w-full"
-              disabledDate={(current) => current && current < moment().startOf('day')}
+            className="w-full"
+            disabledDate={(current) => current && current < moment().startOf('day')}
           />
         </Form.Item>
         <div className="w-full flex justify-between">

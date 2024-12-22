@@ -154,7 +154,7 @@ export const ModalAddRequest = (props: any) => {
                         name="department"
                         label="Department:"
                         className="w-1/2"
-                        rules={[{ required: true, message: 'Please select department' }]}
+                        rules={user?.role === UserRole.Admin ? [{ required: true, message: 'Please select department' }] : []}
                     >
                         {user?.role === UserRole.Admin ? (
                             <Select

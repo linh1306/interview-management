@@ -125,7 +125,7 @@ export const RequestPage = () => {
     const fetchRequests = async (search?: string) => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:8080/api/v1/request', {
+            const response = await axios.get('http://103.56.158.135:8086/api/v1/request', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Accept': 'application/json'
@@ -179,7 +179,7 @@ export const RequestPage = () => {
         try {
             setLoading(true);
             await axios.patch(
-                `http://localhost:8080/api/v1/request/${id}/status`,
+                `http://103.56.158.135:8086/api/v1/request/${id}/status`,
                 { status: newStatus },
                 {
                     headers: {
@@ -224,7 +224,7 @@ export const RequestPage = () => {
 
     const handleCreateRequest = async (values: any) => {
         try {
-            await axios.post('http://localhost:8080/api/v1/request', values, {
+            await axios.post('http://103.56.158.135:8086/api/v1/request', values, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/json'
@@ -281,7 +281,7 @@ export const RequestPage = () => {
                     loading={loading}
                     onDeleteItem={async (record) => {
                         try {
-                            await axios.delete(`http://localhost:8080/api/v1/request/${record.id}`, {
+                            await axios.delete(`http://103.56.158.135:8086/api/v1/request/${record.id}`, {
                                 headers: {
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                                 }

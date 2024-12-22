@@ -166,7 +166,10 @@ export const ModalAddCandidate = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter position' }]}
           >
-            <Select options={positionOptions} />
+            <Select
+              data-testid="select-position"
+              options={positionOptions}
+            />
           </Form.Item>
           <Form.Item
             name="status"
@@ -174,7 +177,10 @@ export const ModalAddCandidate = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please select status' }]}
           >
-            <Select options={statusOptions} />
+            <Select
+              data-testid="select-status"
+              options={statusOptions}
+            />
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">
@@ -185,6 +191,7 @@ export const ModalAddCandidate = (props: any) => {
             rules={[{ required: true, message: 'Please enter skill' }]}
           >
             <Select
+              data-testid="select-skills"
               mode="tags"
             />
           </Form.Item>
@@ -194,7 +201,10 @@ export const ModalAddCandidate = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please select highest level' }]}
           >
-            <Select options={highestLevelOptions} />
+            <Select
+              data-testid="select-highest-level"
+              options={highestLevelOptions}
+            />
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">
@@ -218,6 +228,7 @@ export const ModalAddCandidate = (props: any) => {
             <Input
               allowClear
               placeholder={"Enter note"}
+              data-testid="select-note"
             />
           </Form.Item>
         </div>
@@ -231,6 +242,7 @@ export const ModalAddCandidate = (props: any) => {
             >
               <Select
                 className="w-full"
+                data-testid="select-department"
                 options={Object.values(UserDepartment).map(v => ({
                   value: v,
                   label: v

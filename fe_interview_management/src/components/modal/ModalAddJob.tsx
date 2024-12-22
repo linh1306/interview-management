@@ -15,6 +15,7 @@ export const ModalAddJob = (props: any) => {
   const skillsOptions = skills.map((skill: Skill) => ({ label: skill.name, value: skill.id }));
   const benefitsOptions = benefits.map((benefit) => ({ label: benefit.name, value: benefit.id }));
   const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({ label: value, value: key }));
+  const [form] = Form.useForm();
   const selectAfter = (
     <Select style={{ width: 60 }} options={[{
       value: 'USD',
@@ -39,14 +40,19 @@ export const ModalAddJob = (props: any) => {
     <Modal
       title={initialValues ? "EDIT JOB" : "ADD JOB"}
       open={isOpen}
-      onOk={() => { }}
-      onCancel={handleClose}
+      onOk={() => { form.resetFields(); }}
+      onCancel={() => {
+        form.resetFields(); // Reset form khi đóng modal
+        handleClose();
+      }}
+
       footer={[]}
       className="text-xl"
       width={900}
       key={initialValues}
     >
       <Form
+        form={form}
         name="layout-multiple-horizontal"
         layout="horizontal"
         className="w-full mt-10"
@@ -55,11 +61,12 @@ export const ModalAddJob = (props: any) => {
           const payload = { ...data, start_date: data.start_date.format("YYYY-MM-DD"), end_date: data.end_date.format("YYYY-MM-DD"), skills };
 
           if (initialValues) {
-            await dispatch(updateJob({payload, id: initialValues.id}));
+            await dispatch(updateJob({ payload, id: initialValues.id }));
           } else {
             await dispatch(createJob(payload));
           }
           await dispatch(getJobs());
+          form.resetFields();
           handleClose();
         }}
         initialValues={{ ...initialValues, currency: initialValues?.currency ? initialValues?.currency : 'USD' }}
@@ -85,6 +92,7 @@ export const ModalAddJob = (props: any) => {
             rules={[{ required: true, message: 'Please enter skill' }]}
           >
             <Select
+              data-testid="select-job-skills"
               mode="tags"
             />
           </Form.Item>
@@ -98,8 +106,9 @@ export const ModalAddJob = (props: any) => {
             rules={[{ required: true, message: 'Please enter start date' }]}
           >
             <DatePicker
-                className="w-full"
-                disabledDate={(current) => current && current < moment().startOf('day')}
+              data-testid="date-job-start"
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
             />
           </Form.Item>
           <Form.Item
@@ -109,8 +118,15 @@ export const ModalAddJob = (props: any) => {
             rules={[{ required: true, message: 'Please enter end date', }]}
           >
             <DatePicker
+              data-testid="date-job-end"
               className="w-full"
               disabledDate={(current) => current && current < moment().startOf('day')}
+              renderExtraFooter={() => (
+                <input
+                  data-testid="date-job-end-input"
+                  type="hidden"
+                />
+              )}
             />
           </Form.Item>
         </div>
@@ -122,6 +138,7 @@ export const ModalAddJob = (props: any) => {
             className="w-1/2 mr-5"
           >
             <InputNumber
+              data-testid="input-salary-from"
               addonAfter={
                 <Form.Item name="currency" noStyle>
                   {selectAfter}
@@ -156,7 +173,11 @@ export const ModalAddJob = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please select gender' }]}
           >
-            <Select options={benefitsOptions} mode='tags' />
+            <Select
+              data-testid="select-job-benefits"
+              options={benefitsOptions}
+              mode='tags'
+            />
           </Form.Item>
           <Form.Item
             name="level"

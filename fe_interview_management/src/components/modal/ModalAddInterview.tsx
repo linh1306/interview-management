@@ -73,6 +73,7 @@ export const ModalAddInterview = (props: any) => {
           >
             <Select
               options={jobOptions}
+              data-testid="select-interview-job"
             />
           </Form.Item>
         </div>
@@ -85,6 +86,7 @@ export const ModalAddInterview = (props: any) => {
           >
             <Select
               options={candidateOptions}
+              data-testid="select-interview-candidate"
               placeholder="Select candidate"
               showSearch
               filterOption={(input, option) =>
@@ -100,6 +102,7 @@ export const ModalAddInterview = (props: any) => {
             rules={[{ required: true, message: 'Please enter position' }]}
           >
             <Select
+              data-testid="select-interview-position"
               options={positionOptions}
             />
           </Form.Item>
@@ -111,7 +114,9 @@ export const ModalAddInterview = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter interviews' }]}
           >
-            <Select options={userOptions} mode="multiple" />
+            <Select
+              data-testid="select-interview-interviewers"
+              options={userOptions} mode="multiple" />
           </Form.Item>
           <Form.Item
             name="status"
@@ -120,6 +125,7 @@ export const ModalAddInterview = (props: any) => {
             rules={[{ required: true, message: 'Please enter status' }]}
           >
             <Select
+              data-testid="select-interview-status"
               options={statusOptions}
             />
           </Form.Item>
@@ -131,6 +137,7 @@ export const ModalAddInterview = (props: any) => {
           rules={[{ required: true, message: 'Please enter date' }]}
         >
           <DatePicker
+            data-testid="date-interview-schedule"
             className="w-full"
             disabledDate={(current) => current && current < moment().startOf('day')}
           />
@@ -142,7 +149,9 @@ export const ModalAddInterview = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter time' }]}
           >
-            <TimePicker className="w-full" />
+            <TimePicker
+              data-testid="time-interview-from"
+              className="w-full" />
           </Form.Item>
           <Form.Item
             name="schedule_time_from"
@@ -150,7 +159,9 @@ export const ModalAddInterview = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please enter time' }]}
           >
-            <TimePicker className="w-full" />
+            <TimePicker
+              data-testid="time-interview-to"
+              className="w-full" />
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">

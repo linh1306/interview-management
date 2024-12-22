@@ -6,13 +6,28 @@ import { Gender, UserDepartment, UserRole, UserStatus } from "@/configs/constant
 import TextArea from "antd/es/input/TextArea";
 import moment from "moment/moment";
 const genderOptions = Object.entries(Gender).map(([key, value]) => ({ label: value, value: value }));
-const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({ label: value, value: value }));
-const statusOptions = Object.entries(UserStatus).map(([key, value]) => ({ label: value, value: value }));
-const roleOptions = Object.entries(UserRole).map(([key, value]) => ({ label: value, value: value }));
+const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({
+  label: value,
+  value: value,
+  'data-testid': `department-option-${value}` // Add test ID for each option
+}));
+
+const statusOptions = Object.entries(UserStatus).map(([key, value]) => ({
+  label: value,
+  value: value,
+  'data-testid': `status-option-${value}`  // Add test ID for each status option
+}));
+
+const roleOptions = Object.entries(UserRole).map(([key, value]) => ({
+  label: value,
+  value: value,
+  'data-testid': `role-option-${value}`  // Add test ID for each role option 
+}));
+
 export const ModalAddUser = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
   const dispatch = useAppDispatch();
-  console.log(initialValues);
+  const [form] = Form.useForm();
   return (
     <Modal
       title={initialValues ? "EDIT USER" : "ADD USER"}
@@ -22,8 +37,10 @@ export const ModalAddUser = (props: any) => {
       footer={[]}
       className="text-xl"
       width={900}
+      afterClose={() => form.resetFields()}
     >
       <Form
+        form={form}
         name="layout-multiple-horizontal"
         layout="horizontal"
         className="w-full mt-10"
@@ -55,6 +72,7 @@ export const ModalAddUser = (props: any) => {
             };
 
             await dispatch(createUser(payload));
+            form.resetFields();
             handleClose();
           }
         }}
@@ -105,7 +123,11 @@ export const ModalAddUser = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please enter role' }]}
           >
-            <Select options={roleOptions} />
+            <Select
+              options={roleOptions}
+              data-testid="role-select"    // Add test ID for select
+              className="role-select"      // Add specific class
+            />
           </Form.Item>
         </div>
 
@@ -146,7 +168,11 @@ export const ModalAddUser = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please select department' }]}
           >
-            <Select options={departmentOptions} />
+            <Select
+              options={departmentOptions}
+              data-testid="department-select"  // Add this
+              className="department-select"
+            />
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">
@@ -156,7 +182,11 @@ export const ModalAddUser = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please select status' }]}
           >
-            <Select options={statusOptions} />
+            <Select
+              options={statusOptions}
+              data-testid="status-select"    // Add test ID for select
+              className="status-select"      // Add specific class
+            />
           </Form.Item>
           <Form.Item
             name="username"

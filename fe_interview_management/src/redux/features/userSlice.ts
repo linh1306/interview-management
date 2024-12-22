@@ -1,4 +1,3 @@
-import { toastOption } from "@/configs/notification.config";
 import { LoadingStatus } from "@/enums/enum";
 import { IUser } from "@/interfaces";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -66,7 +65,11 @@ const userSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         if (action.payload) {
           state.users.push(action.payload);
-          toast("User created successfully");
+          toast("User created successfully", {
+            position: "bottom-right",
+            autoClose: 2000,
+          });
+
         }
       })
       .addMatcher(
@@ -80,7 +83,11 @@ const userSlice = createSlice({
             errorCode: action.payload?.errorCode ?? action.error.code,
           };
           state.loading = LoadingStatus.Rejected;
-          toast.error(state.error.message, toastOption);
+          toast.error(state.error.message, {
+            position: "bottom-right",
+            autoClose: 3000,
+          });
+
         }
       )
       .addMatcher(

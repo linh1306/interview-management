@@ -86,7 +86,7 @@ class TestRequest:
 
     def test_od_create_request(self):
         """Test creating recruitment requests"""
-        self.login('hoangtd', '123456')
+        self.login('it', '123456')
 
         test_requests = [
             {

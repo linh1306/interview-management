@@ -299,6 +299,7 @@ class TestPurchase():
         logout_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, ".ant-dropdown-menu-item:last-child"))
         )
+        time.sleep(1)
         logout_button.click()
         self.test_login('nam.tran', '123456')
         avatar_dropdown = WebDriverWait(self.driver, 10).until(

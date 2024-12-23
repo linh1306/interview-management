@@ -77,7 +77,7 @@ class TestCandidate:
             {
                 "full_name": "John Doe",
                 "email": "john.binson@test.com",
-                "phone": "0123456789",
+                "phone": "0123456781",
                 "dob": "1990-01-01",
                 "address": "123 Nguyễn Văn Linh, Hà Nội",
                 "gender": "Male",
@@ -92,7 +92,7 @@ class TestCandidate:
             {
                 "full_name": "Jane Smith",
                 "email": "taylor.smith@test.com",
-                "phone": "0987654329",
+                "phone": "0987654319",
                 "dob": "1992-05-15",
                 "address": "456 Nguyễn Văn Linh, Hà Nội",
                 "gender": "Female",

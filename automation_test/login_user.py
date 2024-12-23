@@ -21,7 +21,7 @@ class TestPurchase():
         try:
             # PostgreSQL connection parameters
             cls.db_params = {
-                "host": "localhost",
+                "host": "103.56.158.135", 
                 "database": "interview_management",
                 "user": "postgres",
                 "password": "woskxn"

@@ -88,7 +88,10 @@ export const ModalAddOffer = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter candidate name' }]}
           >
-            <Select options={candidateOptions} />
+            <Select
+              data-testid="select-offer-candidate"
+              options={candidateOptions}
+            />
           </Form.Item>
           <Form.Item
             name="department"
@@ -97,6 +100,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter department' }]}
           >
             <Select
+              data-testid="select-offer-department"
               options={departmentOptions}
             />
           </Form.Item>
@@ -109,6 +113,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter job' }]}
           >
             <Select
+              data-testid="select-offer-interview"
               options={interviewOptions}
               onChange={(value) => {
                 setSelectedInterview(interviews.find((it) => it.id === value));
@@ -122,6 +127,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter position' }]}
           >
             <Select
+              data-testid="select-offer-position"
               options={positionOptions}
             />
           </Form.Item>
@@ -134,6 +140,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter approver' }]}
           >
             <Select
+              data-testid="select-offer-approver"
               options={approverOptions}
             />
           </Form.Item>
@@ -144,6 +151,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter status' }]}
           >
             <Select
+              data-testid="select-offer-status"
               options={statusOptions}
             />
           </Form.Item>
@@ -155,7 +163,9 @@ export const ModalAddOffer = (props: any) => {
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter level' }]}
           >
-            <Select options={levelOptions} />
+            <Select
+              data-testid="select-offer-level"
+              options={levelOptions} />
           </Form.Item>
           <Form.Item
             name="contract_type"
@@ -163,7 +173,9 @@ export const ModalAddOffer = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: 'Please enter type' }]}
           >
-            <Select options={offerTypeOptions} />
+            <Select
+              data-testid="select-offer-contract"
+              options={offerTypeOptions} />
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">
@@ -174,6 +186,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter time' }]}
           >
             <DatePicker
+              data-testid="select-offer-from"
               className="w-full"
               disabledDate={(current) => current && current < moment().startOf('day')}
             />
@@ -185,6 +198,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter time' }]}
           >
             <DatePicker
+              data-testid="select-offer-to"
               className="w-full"
               disabledDate={(current) => current && current < moment().startOf('day')}
             />
@@ -198,6 +212,7 @@ export const ModalAddOffer = (props: any) => {
             rules={[{ required: true, message: 'Please enter salary' }]}
           >
             <InputNumber
+              data-testid="input-offer-salary"
               addonAfter={
                 <Form.Item name="currency" noStyle>
                   {<Select style={{ width: 60 }} options={[{
@@ -230,6 +245,7 @@ export const ModalAddOffer = (props: any) => {
             className="w-1/2"
           >
             <Input
+              data-testid="input-offer-note"
               allowClear
               placeholder={"Enter note"}
             />

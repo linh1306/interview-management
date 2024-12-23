@@ -88,7 +88,8 @@ class TestPurchase():
         4. Click login button
         """
         # Navigate to login page
-        self.driver.get("http://localhost:5173/login")
+        self.driver.get("http://103.56.158.135:5173/login")
+        # self.driver.get("http://localhost:5173/login")
         self.driver.maximize_window()
 
         # Enter username

@@ -3,9 +3,11 @@ import { DatePicker, Form, Input, InputNumber, Modal, Select, Upload, UploadProp
 import { CandidateStatus, Gender, HighestLevelCandidate, JobStatus, OfferPosition, UserDepartment, UserRole } from "@/configs/constants.tsx";
 import { DownloadOutlined, EyeOutlined, InboxOutlined, UserOutlined, PhoneOutlined, MailOutlined, HomeOutlined, BookOutlined, TrophyOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
+import { useForm } from 'antd/es/form/Form';
 import { Skill } from "@/interfaces/job.interface.ts";
+import {OfferPositionByDepartment} from '@/configs/constants.tsx'
 import { createCandidate, getCandidates, updateCandidate } from "@/redux/features/candidateSlice.ts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import moment from "moment/moment";
 const genderOptions = Object.entries(Gender).map(([key, value]) => ({ label: value, value: key }));
 export const ModalAddCandidate = (props: any) => {
@@ -17,9 +19,23 @@ export const ModalAddCandidate = (props: any) => {
   const statusOptions = Object.entries(CandidateStatus).map(([key, value]) => ({ label: value, value: value }));
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
   const [fileList, setFileList] = useState<any>([]);
-
+ const [form] = Form.useForm();
+  const [department, setDepartment] = useState(null)
+  const handleDepartmentChange = (val) => {
+        setDepartment(val)
+  };
   const user = useAppSelector((state) => state.auth.currentUser)
-
+  const [positionOptionsByDept, setPositionOptionsByDept] = useState<any[]>([]);
+  const alertFail = () =>{
+    console.log(10)
+  }
+useEffect(() => {
+  if (department) {
+    setPositionOptionsByDept(OfferPositionByDepartment[department]);
+  } else {
+    setPositionOptionsByDept([]);
+  }
+}, [department]);
   const selectAfter = (
     <Select style={{ width: 60 }} options={[{
       value: 'Year(s)',
@@ -41,6 +57,7 @@ export const ModalAddCandidate = (props: any) => {
       key={initialValues}
     >
       <Form
+        form={form}
         name="layout-multiple-horizontal"
         layout="horizontal"
         className="w-full mt-10"
@@ -159,30 +176,30 @@ export const ModalAddCandidate = (props: any) => {
             <DownloadOutlined href={initialValues.attach_file} />
           </div>
         }
-        <div className="w-full flex justify-between">
-          <Form.Item
-            name="position"
-            label="Position:"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please enter position' }]}
-          >
-            <Select
-              data-testid="select-position"
-              options={positionOptions}
-            />
-          </Form.Item>
-          <Form.Item
-            name="status"
-            label="Status"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please select status' }]}
-          >
-            <Select
-              data-testid="select-status"
-              options={statusOptions}
-            />
-          </Form.Item>
-        </div>
+
+        {
+          [UserRole.Admin, UserRole.HR].includes(user?.role) && <div className="w-full flex justify-between">
+            <Form.Item
+              name="department"
+              label="Owner Department"
+              className="w-1/2 mr-5"
+              rules={[{ required: true, message: 'Please choose department' }]}
+            >
+              <Select
+                className="w-full"
+                data-testid="select-department"
+                options={Object.values(UserDepartment).map(v => ({
+                  value: v,
+                  label: v
+                }))}
+                onChange = {value => handleDepartmentChange(value)}
+              />
+            </Form.Item>
+
+          </div>
+}
+
+
         <div className="w-full flex justify-between">
           <Form.Item
             name="skills"
@@ -232,28 +249,52 @@ export const ModalAddCandidate = (props: any) => {
             />
           </Form.Item>
         </div>
-        {
-          [UserRole.Admin, UserRole.HR].includes(user?.role) && <div className="w-full flex justify-between">
-            <Form.Item
-              name="department"
-              label="Owner Department"
-              className="w-1/2 mr-5"
-              rules={[{ required: true, message: 'Please choose department' }]}
-            >
-              <Select
-                className="w-full"
-                data-testid="select-department"
-                options={Object.values(UserDepartment).map(v => ({
-                  value: v,
-                  label: v
-                }))}
-              />
-            </Form.Item>
-
-            <div className="w-1/2"></div>
-          </div>
+         <div className="w-full flex justify-between">
+<Form.Item
+  name="position"
+  label="Position:"
+  className="w-1/2 mr-5"
+  rules={[
+    { required: true, message: 'Please choose a position' },
+    ({ getFieldValue }) => ({
+      validator(_, value) {
+        if (!getFieldValue('department')) {
+          return Promise.reject(new Error('Please choose the department first'));
         }
+        return Promise.resolve();
+      },
+    }),
+  ]}
+>
+  <Select
+    data-testid="select-position"
+    options={positionOptionsByDept.map((position) => ({ label: position.label, value: position.value }))}
 
+    onClick={() => {
+      if (!department) {
+        form.setFields([
+          {
+            name: 'position',
+            errors: ['Please choose the department first'],
+          },
+        ]);
+      }
+    }}
+  />
+</Form.Item>
+
+        <Form.Item
+            name="status"
+            label="Status"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please select status' }]}
+          >
+            <Select
+              data-testid="select-status"
+              options={statusOptions}
+            />
+          </Form.Item>
+</div>
         <div className="w-full flex justify-end gap-x-5 mt-5">
           <Form.Item>
             <button

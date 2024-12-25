@@ -15,7 +15,6 @@ export enum UserRole {
   Manager = 'Manager',
   Admin = 'Admin',
 }
-
 export enum UserDepartment {
   IT = 'IT',
   HR = 'HR',
@@ -24,6 +23,44 @@ export enum UserDepartment {
   Marketing = 'Marketing',
   Accounting = 'Accounting',
 }
+export const OfferPosition = [
+  'Backend Developer',
+  'Bussiness Analyst',
+  'Tester',
+  'HR',
+  'Project Manager',
+  'Frontend Developer',
+  'Fullstack Developer',
+  'Devops',
+]
+export const OfferPositionByDepartment: Record<UserDepartment, { value: string; label: string }[]> = {
+  [UserDepartment.IT]: [
+    { value: 'backend_developer', label: 'Backend Developer' },
+    { value: 'frontend_developer', label: 'Frontend Developer' },
+    { value: 'fullstack_developer', label: 'Fullstack Developer' },
+    { value: 'devops', label: 'DevOps' },
+  ],
+  [UserDepartment.HR]: [
+    { value: 'hr_manager', label: 'HR Manager' },
+    { value: 'recruiter', label: 'Recruiter' },
+  ],
+  [UserDepartment.Finance]: [
+    { value: 'financial_analyst', label: 'Financial Analyst' },
+    { value: 'accountant', label: 'Accountant' },
+  ],
+  [UserDepartment.Communication]: [
+    { value: 'pr_manager', label: 'PR Manager' },
+    { value: 'content_specialist', label: 'Content Specialist' },
+  ],
+  [UserDepartment.Marketing]: [
+    { value: 'marketing_manager', label: 'Marketing Manager' },
+    { value: 'seo_specialist', label: 'SEO Specialist' },
+  ],
+  [UserDepartment.Accounting]: [
+    { value: 'auditor', label: 'Auditor' },
+    { value: 'accounting_manager', label: 'Accounting Manager' },
+  ],
+};
 
 export enum JobStatus {
   Closed = 'Closed',
@@ -73,16 +110,7 @@ export const HEADER_TABS = [
   },
 ];
 
-export const OfferPosition = [
-  'Backend Developer',
-  'Bussiness Analyst',
-  'Tester',
-  'HR',
-  'Project Manager',
-  'Frontend Developer',
-  'Fullstack Developer',
-  'Devops',
-]
+
 
 export const HighestLevelCandidate = [
   'High School',

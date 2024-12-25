@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Helmet from "@/components/Helmet.tsx";
-import { Button, Input, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import GenericTable from "@/components/Table";
 import { InterviewStatus } from "@/configs/constants.tsx";
@@ -12,6 +11,8 @@ import { getUsers } from "@/redux/features/userSlice.ts";
 import { getInterviews } from "@/redux/features/interviewSlice.ts";
 import moment from "moment";
 import dayjs from "dayjs";
+import { Button, Input, Select, message } from "antd";
+import axios from "axios";
 const statusOptions = Object.entries(InterviewStatus).map(([key, value]) => ({ label: value, value: key }));
 const columns = [
   {
@@ -77,6 +78,28 @@ export const InterviewPage = () => {
     setSelectedInterview(undefined);
     setIsModalVisible(false);
   }
+  const handleDelete = async (record) => {
+    try {
+      console.log("Deleting record:", record); // Log để debug
+
+      const response = await axios.delete(`http://103.56.158.135:8086/api/v1/interview-schedule/${record.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      console.log("Delete response:", response); // Log response
+
+      if (response.status === 200) {
+        message.success('Deleted successfully');
+        // Refresh lại danh sách
+        dispatch(getInterviews(undefined));
+      }
+    } catch (error) {
+      console.error('Error deleting interview:', error);
+      message.error(error.response?.data?.message || 'Failed to delete interview');
+    }
+  };
   return (
     <div className="p-10 bg-white h-full rounded">
       <Helmet title="Manage Offer" />
@@ -130,6 +153,8 @@ export const InterviewPage = () => {
             });
             setIsModalVisible(true);
           }}
+          onDeleteItem={handleDelete}
+
         />
       </div>
     </div>

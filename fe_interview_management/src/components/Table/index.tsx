@@ -42,7 +42,7 @@ const GenericTable = <T extends {}>({
             </Button>
           }
           {
-            onDeleteItem && role !== 'Interviewer' &&
+            onDeleteItem && role == 'Admin' &&
             <Popconfirm
               id={'delete'}
               title="Delete the task"
@@ -62,7 +62,7 @@ const GenericTable = <T extends {}>({
               <Button key="delete" danger id="delete" onClick={(e) => {
                 e.stopPropagation(); // Ensure row click event is not triggered
               }}>
-                <DeleteOutlined  id="ic_delete"/>
+                <DeleteOutlined id="ic_delete" />
               </Button>
             </Popconfirm>
           }
@@ -93,6 +93,7 @@ const GenericTable = <T extends {}>({
   };
 
   return (
+    console.log('role: ', role),
     <Table
       scroll={{ x: 'max-content' }}
       className={className}
@@ -100,7 +101,7 @@ const GenericTable = <T extends {}>({
       columns={indexedColumns}
       dataSource={data}
       rowKey="id"
-      pagination={{showSizeChanger: true, pageSizeOptions: ['5', '10', '15', '20'], defaultPageSize: 5} as any}
+      pagination={{ showSizeChanger: true, pageSizeOptions: ['5', '10', '15', '20'], defaultPageSize: 5 } as any}
       onRow={(record, rowIndex) => {
         return {
           onClick: (event) => {

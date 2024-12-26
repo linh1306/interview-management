@@ -5,7 +5,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import moment from "moment";
 import { UserRole } from "@/configs/constants.tsx";
 import { createRequest, getRequests, updateRequest } from "@/redux/features/requestSlice.ts";
-
+import { notification } from "antd";
+import { useState, useEffect } from "react";
+import { OfferPositionByDepartment } from '@/configs/constants.tsx';
 const { RangePicker } = DatePicker;
 
 const LevelOptions = [
@@ -38,8 +40,34 @@ export const ModalAddRequest = (props: any) => {
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.currentUser);
 
+    const [form] = Form.useForm();
+    const [department, setDepartment] = useState(null);
+    const [positionOptionsByDept, setPositionOptionsByDept] = useState<any[]>([]);
+
     const levelOptions = LevelOptions.map(level => ({ label: level, value: level }));
     const workplaceOptions = WorkplaceOptions.map(place => ({ label: place, value: place }));
+
+    const handleDepartmentChange = (val) => {
+        setDepartment(val);
+        form.setFieldValue('position', undefined);
+        setPositionOptionsByDept(OfferPositionByDepartment[val] || []);
+    };
+
+    useEffect(() => {
+        if (department) {
+            setPositionOptionsByDept(OfferPositionByDepartment[department] || []);
+        } else {
+            setPositionOptionsByDept([]);
+        }
+    }, [department]);
+
+    useEffect(() => {
+        // Set initial department if editing
+        if (initialValues?.department) {
+            setDepartment(initialValues.department);
+        }
+    }, [initialValues]);
+
 
     return (
         <Modal
@@ -66,14 +94,28 @@ export const ModalAddRequest = (props: any) => {
                         status: 'Pending'
                     };
                     delete payload.recruitment_period;
+                    try {
+                        if (initialValues) {
+                            await dispatch(updateRequest({ payload, id: initialValues.id }));
+                        } else {
+                            await dispatch(createRequest(payload));
+                        }
+                        await dispatch(getRequests({}));
 
-                    if (initialValues) {
-                        await dispatch(updateRequest({ payload, id: initialValues.id }));
-                    } else {
-                        await dispatch(createRequest(payload));
+                        notification.success({
+                            message: 'Success',
+                            description: 'Action Done.',
+                        });
+
+                        handleClose();
+                    } catch (error) {
+                        // Thông báo lỗi nếu có
+                        notification.error({
+                            message: 'Error',
+                            description: 'Action Fail.',
+                        });
                     }
-                    await dispatch(getRequests({}));
-                    handleClose();
+
                 }}
                 initialValues={initialValues ? {
                     ...initialValues,
@@ -87,16 +129,57 @@ export const ModalAddRequest = (props: any) => {
                 <h3 className="font-semibold mb-5">Recruitment Request Information</h3>
                 <div className="w-full flex justify-between">
                     <Form.Item
+                        name="department"
+                        label="Department:"
+                        className="w-1/2"
+                        rules={user?.role === UserRole.Admin ? [{ required: true, message: 'Please select department' }] : []}
+                    >
+                        {user?.role === UserRole.Admin ? (
+                            <Select
+                                options={DepartmentOptions.map(dept => ({ label: dept, value: dept }))}
+                                placeholder="Select department"
+                                onChange={handleDepartmentChange}
+                            />
+                        ) : (
+                            <Input
+                                disabled
+                                value={user?.department}
+                                placeholder={user?.department}
+                            />
+                        )}
+                    </Form.Item>
+
+                    <Form.Item
                         name="position"
                         label="Position:"
                         className="w-1/2 mr-5"
-                        rules={[{ required: true, message: 'Please enter position' }]}
+                        rules={[
+                            { required: true, message: 'Please select a position' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!getFieldValue('department')) {
+                                        return Promise.reject(new Error('Please choose the department first'));
+                                    }
+                                    return Promise.resolve();
+                                },
+                            }),
+                        ]}
                     >
-                        <Input
-                            allowClear
-                            placeholder="Enter position title"
+                        <Select
+                            options={positionOptionsByDept.map((position) => ({
+                                label: position.label,
+                                value: position.value,
+                            }))}
+
+                            disabled={!department}
+                            placeholder={department ? "Select position" : "Please select department first"}
+                            
                         />
                     </Form.Item>
+
+                </div>
+
+                <div className="w-full flex justify-between">
                     <Form.Item
                         name="quantity"
                         label="Quantity:"
@@ -109,9 +192,6 @@ export const ModalAddRequest = (props: any) => {
                             placeholder="Enter number of positions"
                         />
                     </Form.Item>
-                </div>
-
-                <div className="w-full flex justify-between">
                     <Form.Item
                         name="recruitment_period"
                         label="Period:"
@@ -124,6 +204,10 @@ export const ModalAddRequest = (props: any) => {
                             disabledDate={(current) => current && current < moment().startOf('day')}
                         />
                     </Form.Item>
+
+                </div>
+
+                <div className="w-full flex justify-between">
                     <Form.Item
                         name="workplace"
                         label="Workplace:"
@@ -135,9 +219,6 @@ export const ModalAddRequest = (props: any) => {
                             placeholder="Select workplace"
                         />
                     </Form.Item>
-                </div>
-
-                <div className="w-full flex justify-between">
                     <Form.Item
                         name="level"
                         label="Level:"
@@ -150,25 +231,7 @@ export const ModalAddRequest = (props: any) => {
                             placeholder="Select required levels"
                         />
                     </Form.Item>
-                    <Form.Item
-                        name="department"
-                        label="Department:"
-                        className="w-1/2"
-                        rules={user?.role === UserRole.Admin ? [{ required: true, message: 'Please select department' }] : []}
-                    >
-                        {user?.role === UserRole.Admin ? (
-                            <Select
-                                options={DepartmentOptions.map(dept => ({ label: dept, value: dept }))}
-                                placeholder="Select department"
-                            />
-                        ) : (
-                            <Input
-                                disabled
-                                value={user?.department}
-                                placeholder={user?.department}
-                            />
-                        )}
-                    </Form.Item>
+
                 </div>
 
                 <Form.Item

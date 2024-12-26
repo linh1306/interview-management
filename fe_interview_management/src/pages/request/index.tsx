@@ -9,8 +9,7 @@ import { createRequest, getRequests, updateRequest } from "@/redux/features/requ
 import moment from "moment";
 import dayjs from "dayjs";
 import axios from "axios";
-
-
+import { notification } from 'antd';
 // Constants for select options
 const RequestStatus = {
     PENDING: 'Pending',
@@ -136,6 +135,7 @@ export const RequestPage = () => {
                 }
             });
             setRequests(response.data.data.results);
+            console.log(response.data.data.results);
         } catch (error) {
             console.error('Error fetching requests:', error);
         } finally {
@@ -230,6 +230,7 @@ export const RequestPage = () => {
                     'Content-Type': 'application/json'
                 }
             });
+            
             fetchRequests(); // Refresh data after creation
             handleClose();
         } catch (error) {
@@ -286,9 +287,20 @@ export const RequestPage = () => {
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                                 }
                             });
+                            notification.success({
+                                message: 'Request deleted successfully',
+                                description: `The request has been successfully deleted.`,
+                                placement: 'topRight',
+                            });
+                    
                             fetchRequests();
                         } catch (error) {
                             console.error('Error deleting request:', error);
+                            notification.error({
+                                message: 'Failed to delete request',
+                                description: 'There was an error deleting the request.',
+                                placement: 'topRight',
+                            });
                         }
                     }}
                     onEditItem={(record) => {

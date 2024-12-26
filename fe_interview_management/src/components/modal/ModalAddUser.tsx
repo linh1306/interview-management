@@ -91,8 +91,9 @@ export const ModalAddUser = (props: any) => {
               allowClear
               placeholder={"Enter full name"}
             />
+          
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="email"
             label="Email:"
             className="w-1/2"
@@ -102,11 +103,46 @@ export const ModalAddUser = (props: any) => {
               allowClear
               placeholder={"Enter email"}
             />
+          </Form.Item> */}
+
+          
+        </div>
+        <div className="w-full flex justify-between">
+         <Form.Item
+            name="username"
+            label="Username"
+            className="w-1/2"
+           
+
+          >
+            <Input />
+          </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
+          {/* <Form.Item
+            name="gender"
+            label="Gender"
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please select gender' }]}
+          >
+            <Select options={genderOptions} />
+          </Form.Item> */}
+          <Form.Item
+            name="department"
+            label="Department"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please select department' }]}
+          >
+            <Select
+              options={departmentOptions}
+              data-testid="department-select"  // Add this
+              className="department-select"
+            />
           </Form.Item>
         </div>
 
         <div className="w-full flex justify-between">
-          <Form.Item
+          {/* <Form.Item
             name="phone"
             label="Phone:"
             className="w-1/2 mr-5"
@@ -116,7 +152,7 @@ export const ModalAddUser = (props: any) => {
               allowClear
               placeholder={"Enter phone"}
             />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="role"
             label="Role:"
@@ -131,7 +167,7 @@ export const ModalAddUser = (props: any) => {
           </Form.Item>
         </div>
 
-        <div className="w-full flex justify-between">
+        {/* <div className="w-full flex justify-between">
           <Form.Item
             name="dob"
             label="Date of Birth:"
@@ -152,8 +188,8 @@ export const ModalAddUser = (props: any) => {
               placeholder={"Enter address"}
             />
           </Form.Item>
-        </div>
-        <div className="w-full flex justify-between">
+        </div> */}
+        {/* <div className="w-full flex justify-between">
           <Form.Item
             name="gender"
             label="Gender"
@@ -174,7 +210,7 @@ export const ModalAddUser = (props: any) => {
               className="department-select"
             />
           </Form.Item>
-        </div>
+        </div> */}
         <div className="w-full flex justify-between">
           <Form.Item
             name="status"
@@ -188,13 +224,13 @@ export const ModalAddUser = (props: any) => {
               className="status-select"      // Add specific class
             />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="username"
             label="Username"
             className="w-1/2"
           >
             <Input />
-          </Form.Item>
+          </Form.Item> */}
         </div>
         <Form.Item
           name="note"

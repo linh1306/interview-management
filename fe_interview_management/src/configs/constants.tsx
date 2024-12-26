@@ -38,7 +38,7 @@ export const OfferPositionByDepartment: Record<UserDepartment, { value: string; 
     { value: 'Backend Developer', label: 'Backend Developer' },
     { value: 'Frontend Developer', label: 'Frontend Developer' },
     { value: 'Fullstack Developer', label: 'Fullstack Developer' },
-    { value: 'DevOps', label: 'DevOps' },
+    { value: 'Devops', label: 'Devops' },
   ],
   [UserDepartment.HR]: [
     { value: 'HR Manager', label: 'HR Manager' },

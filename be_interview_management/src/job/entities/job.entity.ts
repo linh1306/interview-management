@@ -36,8 +36,8 @@ export class Job extends AbstractEntity {
   @Column({ type: 'enum', enum: JobStatus, default: JobStatus.Draft })
   status: JobStatus;
 
-  @Column('text', { nullable: true, array: true })
-  benefits: string[];
+  @Column()
+  position: string;
 
   @Column('text', { nullable: true, array: true })
   skills: string[];

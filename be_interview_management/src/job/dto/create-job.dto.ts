@@ -15,6 +15,7 @@ import { UserDepartment } from '@/user/user.constant';
 export class CreateJobDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @IsOptional()
   @IsString()
   @Trim()
   working_address: string;
@@ -67,11 +68,10 @@ export class CreateJobDto {
   @IsArray()
   skills: string[];
 
-  @ApiProperty({ example: ['a', 'b', 'c'] })
+  @ApiProperty()
   @IsNotEmpty()
   @IsString({ each: true })
-  @IsArray()
-  benefits: string[];
+  position: string;
 
   @ApiProperty({ example: JobStatus })
   @IsNotEmpty()

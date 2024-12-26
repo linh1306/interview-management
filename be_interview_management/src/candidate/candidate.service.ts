@@ -101,8 +101,8 @@ export class CandidateService extends BaseService<Candidate> {
       where: { id },
     });
 
-    if (candidate.status !== CandidateStatus.Open)
-      throw new BadRequest({ message: 'cannot remove this candidate' });
+    // if (candidate.status !== CandidateStatus.Open)
+    //   throw new BadRequest({ message: 'cannot remove this candidate' });
     return this.repository.update(id, { deleted: new Date() });
   }
 }

@@ -5,7 +5,7 @@ import { DownloadOutlined, EyeOutlined, InboxOutlined, UserOutlined, PhoneOutlin
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { useForm } from 'antd/es/form/Form';
 import { Skill } from "@/interfaces/job.interface.ts";
-import {OfferPositionByDepartment} from '@/configs/constants.tsx'
+import { OfferPositionByDepartment } from '@/configs/constants.tsx'
 import { createCandidate, getCandidates, updateCandidate } from "@/redux/features/candidateSlice.ts";
 import { useState, useEffect } from "react";
 import moment from "moment/moment";
@@ -19,23 +19,23 @@ export const ModalAddCandidate = (props: any) => {
   const statusOptions = Object.entries(CandidateStatus).map(([key, value]) => ({ label: value, value: value }));
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
   const [fileList, setFileList] = useState<any>([]);
- const [form] = Form.useForm();
+  const [form] = Form.useForm();
   const [department, setDepartment] = useState(null)
   const handleDepartmentChange = (val) => {
-        setDepartment(val)
+    setDepartment(val)
   };
   const user = useAppSelector((state) => state.auth.currentUser)
   const [positionOptionsByDept, setPositionOptionsByDept] = useState<any[]>([]);
-  const alertFail = () =>{
+  const alertFail = () => {
     console.log(10)
   }
-useEffect(() => {
-  if (department) {
-    setPositionOptionsByDept(OfferPositionByDepartment[department]);
-  } else {
-    setPositionOptionsByDept([]);
-  }
-}, [department]);
+  useEffect(() => {
+    if (department) {
+      setPositionOptionsByDept(OfferPositionByDepartment[department]);
+    } else {
+      setPositionOptionsByDept([]);
+    }
+  }, [department]);
   const selectAfter = (
     <Select style={{ width: 60 }} options={[{
       value: 'Year(s)',
@@ -107,6 +107,9 @@ useEffect(() => {
               placeholder={"Enter full name"}
             />
           </Form.Item>
+
+        </div>
+        <div className="w-full flex justify-between">
           <Form.Item
             name="email"
             label="Email:"
@@ -120,7 +123,7 @@ useEffect(() => {
             />
           </Form.Item>
         </div>
-        <div className="w-full flex justify-between">
+        {/* <div className="w-full flex justify-between">
           <Form.Item
             name="dob"
             label="D.O.B:"
@@ -143,7 +146,7 @@ useEffect(() => {
               placeholder={"Enter address"}
             />
           </Form.Item>
-        </div>
+        </div> */}
         <div className="w-full flex justify-between">
           <Form.Item
             name="phone"
@@ -156,14 +159,14 @@ useEffect(() => {
               placeholder={"Enter full phone no"}
             />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="gender"
             label="Gender"
             className="w-1/2"
             rules={[{ required: true, message: 'Please select gender' }]}
           >
             <Select options={genderOptions} />
-          </Form.Item>
+          </Form.Item> */}
         </div>
         <h3 className="font-semibold mb-5">II. Professional Information</h3>
         {
@@ -192,16 +195,48 @@ useEffect(() => {
                   value: v,
                   label: v
                 }))}
-                onChange = {value => handleDepartmentChange(value)}
+                onChange={value => handleDepartmentChange(value)}
               />
             </Form.Item>
 
           </div>
-}
+        }
+        <Form.Item
+          name="position"
+          label="Position:"
+          className="w-1/2 mr-5"
+          rules={[
+            { required: true, message: 'Please choose a position' },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!getFieldValue('department')) {
+                  return Promise.reject(new Error('Please choose the department first'));
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}
+        >
+          <Select
+            data-testid="select-position"
+            options={positionOptionsByDept.map((position) => ({ label: position.label, value: position.value }))}
+
+            onClick={() => {
+              if (!department) {
+                form.setFields([
+                  {
+                    name: 'position',
+                    errors: ['Please choose the department first'],
+                  },
+                ]);
+              }
+            }}
+          />
+        </Form.Item>
 
 
         <div className="w-full flex justify-between">
-          <Form.Item
+          {/* <Form.Item
             name="skills"
             label="Skill:"
             className="w-1/2 mr-5"
@@ -211,7 +246,7 @@ useEffect(() => {
               data-testid="select-skills"
               mode="tags"
             />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="highest_level"
             label="Highest level"
@@ -237,6 +272,21 @@ useEffect(() => {
               addonAfter={<div>Year(s)</div>}
             />
           </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="status"
+            label="Status"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please select status' }]}
+          >
+            <Select
+              data-testid="select-status"
+              options={statusOptions}
+            />
+          </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
           <Form.Item
             name="note"
             label="Note"
@@ -249,52 +299,6 @@ useEffect(() => {
             />
           </Form.Item>
         </div>
-         <div className="w-full flex justify-between">
-<Form.Item
-  name="position"
-  label="Position:"
-  className="w-1/2 mr-5"
-  rules={[
-    { required: true, message: 'Please choose a position' },
-    ({ getFieldValue }) => ({
-      validator(_, value) {
-        if (!getFieldValue('department')) {
-          return Promise.reject(new Error('Please choose the department first'));
-        }
-        return Promise.resolve();
-      },
-    }),
-  ]}
->
-  <Select
-    data-testid="select-position"
-    options={positionOptionsByDept.map((position) => ({ label: position.label, value: position.value }))}
-
-    onClick={() => {
-      if (!department) {
-        form.setFields([
-          {
-            name: 'position',
-            errors: ['Please choose the department first'],
-          },
-        ]);
-      }
-    }}
-  />
-</Form.Item>
-
-        <Form.Item
-            name="status"
-            label="Status"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please select status' }]}
-          >
-            <Select
-              data-testid="select-status"
-              options={statusOptions}
-            />
-          </Form.Item>
-</div>
         <div className="w-full flex justify-end gap-x-5 mt-5">
           <Form.Item>
             <button

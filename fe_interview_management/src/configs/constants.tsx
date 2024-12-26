@@ -122,7 +122,6 @@ export const HighestLevelCandidate = [
 export const CandidateStatus = [
   'Banned',
   'Waiting for interview',
-  'In progress',
   'Open',
   'Cancelled interview',
   'Passed interview',

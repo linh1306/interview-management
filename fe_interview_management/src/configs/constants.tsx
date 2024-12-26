@@ -36,47 +36,47 @@ export const OfferPosition = [
 
 export const OfferPositionByDepartment: Record<UserDepartment, { value: string; label: string }[]> = {
   [UserDepartment.HR]: [
-    { value: 'hr_manager', label: 'HR Manager' },
-    { value: 'recruitment_specialist', label: 'Recruitment Specialist' },
-    { value: 'training_specialist', label: 'Training Specialist' },
-    { value: 'administrative_specialist', label: 'Administrative Specialist' }
+    { value: 'HR Manager', label: 'HR Manager' },
+    { value: 'Recruitment Specialist', label: 'Recruitment Specialist' },
+    { value: 'Training Specialist', label: 'Training Specialist' },
+    { value: 'Administrative Specialist', label: 'Administrative Specialist' }
   ],
   [UserDepartment.AF]: [
-    { value: 'chief_accountant', label: 'Chief Accountant' },
-    { value: 'accountant_specialist', label: 'Accountant Specialist' },
-    { value: 'financial_specialist', label: 'Financial Specialist' },
-    { value: 'cashier', label: 'Cashier' },
-    { value: 'legal_manager', label: 'Legal Manager' },
-    { value: 'contract_specialist', label: 'Contract Specialist' }
+    { value: 'Chief Accountant', label: 'Chief Accountant' },
+    { value: 'Accountant Specialist', label: 'Accountant Specialist' },
+    { value: 'Financial Specialist', label: 'Financial Specialist' },
+    { value: 'Cashier', label: 'Cashier' },
+    { value: 'Legal Manager', label: 'Legal Manager' },
+    { value: 'Contract Specialist', label: 'Contract Specialist' }
   ],
   [UserDepartment.IT]: [
-    { value: 'it_manager', label: 'IT Manager' },
-    { value: 'software_engineer', label: 'Software Engineer' },
-    { value: 'system_engineer', label: 'System Engineer' },
-    { value: 'backend_developer', label: 'Backend Developer' },
-    { value: 'frontend_developer', label: 'Frontend Developer' },
-    { value: 'fullstack_developer', label: 'Fullstack Developer' },
-    { value: 'tester', label: 'Tester' },
-    { value: 'quality_inspector', label: 'Quality Inspector' }
+    { value: 'IT Manager', label: 'IT Manager' },
+    { value: 'Software Engineer', label: 'Software Engineer' },
+    { value: 'System Engineer', label: 'System Engineer' },
+    { value: 'Backend Developer', label: 'Backend Developer' },
+    { value: 'Frontend Developer', label: 'Frontend Developer' },
+    { value: 'Fullstack Developer', label: 'Fullstack Developer' },
+    { value: 'Tester', label: 'Tester' },
+    { value: 'Quality Inspector', label: 'Quality Inspector' }
   ],
   [UserDepartment.Marketing]: [
-    { value: 'marketing_manager', label: 'Marketing Manager' },
-    { value: 'sales_executive', label: 'Sales Executive' },
-    { value: 'business_executive', label: 'Business Executive' },
-    { value: 'content_marketing', label: 'Content Marketing' },
-    { value: 'content_creator', label: 'Content Creator' }
+    { value: 'Marketing Manager', label: 'Marketing Manager' },
+    { value: 'Sales Executive', label: 'Sales Executive' },
+    { value: 'Business Executive', label: 'Business Executive' },
+    { value: 'Content Marketing', label: 'Content Marketing' },
+    { value: 'Content Creator', label: 'Content Creator' }
   ],
   [UserDepartment.Purchasing]: [
-    { value: 'purchasing_manager', label: 'Purchasing Manager' },
-    { value: 'sourcing_specialist', label: 'Sourcing Specialist' },
-    { value: 'warehouse_staff', label: 'Warehouse Staff' },
-    { value: 'supply_chain_specialist', label: 'Supply Chain Specialist' }
+    { value: 'Purchasing Manager', label: 'Purchasing Manager' },
+    { value: 'Sourcing Specialist', label: 'Sourcing Specialist' },
+    { value: 'Warehouse Staff', label: 'Warehouse Staff' },
+    { value: 'Supply Chain Specialist', label: 'Supply Chain Specialist' }
   ],
   [UserDepartment.PR]: [
-    { value: 'pr_manager', label: 'PR Manager' },
-    { value: 'pr_executive', label: 'PR Executive' },
-    { value: 'media_specialist', label: 'Media Specialist' },
-    { value: 'event_specialist', label: 'Event Specialist' }
+    { value: 'PR Manager', label: 'PR Manager' },
+    { value: 'PR Executive', label: 'PR Executive' },
+    { value: 'Media Specialist', label: 'Media Specialist' },
+    { value: 'Event Specialist', label: 'Event Specialist' }
   ]
 };
 

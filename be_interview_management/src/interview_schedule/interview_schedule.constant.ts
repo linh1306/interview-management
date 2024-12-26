@@ -1,6 +1,8 @@
 export enum InterviewStatus {
   Open = 'Open',
   Invited = 'Invited',
-  Interviewed = 'Interviewd',
+  Interviewed = 'Interviewed',
   Cancelled = 'Cancelled',
+  Passed = 'Passed',
+  Failed = 'Failed',
 }

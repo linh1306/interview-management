@@ -3,7 +3,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { useMemo } from "react";
 import { InterviewStatus, OfferPosition } from "@/configs/constants.tsx";
 import { createInterview, getInterviews, updateInterview } from "@/redux/features/interviewSlice.ts";
+import { createCandidate, getCandidates, updateCandidate } from "@/redux/features/candidateSlice.ts";
 import moment from "moment";
+import { useState, useEffect } from "react";
 
 export const ModalAddInterview = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
@@ -16,14 +18,66 @@ export const ModalAddInterview = (props: any) => {
     label: `${candidate.full_name} (${candidate.email})`,
     value: candidate.id
   })), [candidates]);
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  // Thêm useEffect để lọc candidates khi job thay đổi
+  useEffect(() => {
+    if (selectedJob) {
+      const job = jobs.find(job => job.id === selectedJob);
+      if (job) {
+        const filtered = candidates.filter(candidate =>
+          candidate.position?.toLowerCase() === job.position?.toLowerCase()
+        );
+
+        setFilteredCandidates(filtered.map(candidate => ({
+          label: `${candidate.full_name} (${candidate.email})`,
+          value: candidate.id
+        })));
+      }
+    } else {
+      setFilteredCandidates([]);
+    }
+  }, [selectedJob, candidates, jobs]);
+
+
 
 
 
   const jobOptions = useMemo(() => jobs.map((job) => ({ label: job.title, value: job.id })), [jobs]);
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
-  const statusOptions = Object.values(InterviewStatus).map((status) => ({ label: status, value: status }));
+  const statusOptions = [
+    { value: 'Invited', label: 'Invited' },
+    { value: 'Interviewed', label: 'Interviewed' }, // Giữ lại Interviewed
+    { value: 'Cancelled', label: 'Cancelled' }
+  ];
+
+
+
   const dispatch = useAppDispatch();
-  console.log(initialValues);
+  const [showResult, setShowResult] = useState(false);
+  const resultOptions = [
+    { label: 'Passed', value: 'Passed' },
+    { label: 'Failed', value: 'Failed' }
+  ];
+
+  // Thêm watch cho status field
+  const [form] = Form.useForm();
+  useEffect(() => {
+    const status = form.getFieldValue('status');
+    setShowResult(status === 'Interviewed');
+  }, [form.getFieldValue('status')]);
+  const updateCandidateStatus = async (status) => {
+    const candidateId = form.getFieldValue('candidate_id')?.value;
+    if (candidateId) {
+      await dispatch(updateCandidate({
+        id: candidateId,
+        payload: { status }
+      }));
+    }
+  };
+  console.log('candidates: ', candidates);
+  console.log('jobs: ', jobs);
   return (
     <Modal
       title={initialValues ? "EDIT INTERVIEW SCHEDULE" : "ADD INTERVIEW SCHEDULE"}
@@ -40,7 +94,22 @@ export const ModalAddInterview = (props: any) => {
         layout="horizontal"
         className="w-full mt-10"
         onFinish={async (data) => {
-          const payload = { ...data, candidate_id: data.candidate_id.value || data.candidate_id, job_id: data.job_id.value || data.job_id, interviewer_ids: data.interviewer_ids.map((it: any) => it.value || it) };
+          const selectedJobData = jobs.find(job => job.id === data.job_id.value || data.job_id);
+          const { result, ...rest } = data;
+          const payload = {
+            ...rest,
+            candidate_id: data.candidate_id.value || data.candidate_id,
+            job_id: data.job_id.value || data.job_id,
+            interviewer_ids: data.interviewer_ids.map((it: any) => it.value || it),
+            position: selectedJobData?.position,
+            status: data.status === 'Interviewed' ? data.result : data.status
+          };
+
+          const status = data.status;
+          if (status === 'Interviewed') {
+            await updateCandidateStatus(data.result === 'Passed' ? 'Passed interview' : 'Banned');
+          }
+
           if (initialValues) {
             await dispatch(updateInterview({ payload: payload, id: initialValues.id }));
           } else {
@@ -49,7 +118,7 @@ export const ModalAddInterview = (props: any) => {
           await dispatch(getInterviews({}));
           handleClose();
         }}
-        initialValues={initialValues}
+        initialValues={initialValues || { status: 'Invited' }}
         labelCol={{ span: 6 }}
         key={initialValues}
       >
@@ -65,6 +134,9 @@ export const ModalAddInterview = (props: any) => {
               placeholder={"Enter schedule title"}
             />
           </Form.Item>
+
+        </div>
+        <div className="w-full flex justify-between">
           <Form.Item
             name="job_id"
             label="Job title:"
@@ -74,6 +146,8 @@ export const ModalAddInterview = (props: any) => {
             <Select
               options={jobOptions}
               data-testid="select-interview-job"
+              onChange={(value) => setSelectedJob(value)}
+
             />
           </Form.Item>
         </div>
@@ -85,7 +159,7 @@ export const ModalAddInterview = (props: any) => {
             rules={[{ required: true, message: 'Please enter candidate name' }]}
           >
             <Select
-              options={candidateOptions}
+              options={filteredCandidates}
               data-testid="select-interview-candidate"
               placeholder="Select candidate"
               showSearch
@@ -95,7 +169,7 @@ export const ModalAddInterview = (props: any) => {
               notFoundContent="No candidate found"
             />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="position"
             label="Position:"
             className="w-1/2"
@@ -105,13 +179,14 @@ export const ModalAddInterview = (props: any) => {
               data-testid="select-interview-position"
               options={positionOptions}
             />
-          </Form.Item>
+          </Form.Item> */}
         </div>
         <div className="w-full flex justify-between">
           <Form.Item
             name="interviewer_ids"
             label="Interviewers:"
-            className="w-1/2 mr-5"
+            // className="w-1/2 mr-5"
+            className="w-1/3 mr-5"
             rules={[{ required: true, message: 'Please enter interviews' }]}
           >
             <Select
@@ -121,14 +196,40 @@ export const ModalAddInterview = (props: any) => {
           <Form.Item
             name="status"
             label="Status:"
-            className="w-1/2"
+            // className="w-1/2"
+            className="w-1/3 mr-5"
             rules={[{ required: true, message: 'Please enter status' }]}
           >
             <Select
               data-testid="select-interview-status"
               options={statusOptions}
+              onChange={(value) => {
+                setShowResult(value === 'Interviewed');
+                if (value === 'Invited') {
+                  updateCandidateStatus('Waiting for interview');
+                } else if (value === 'Cancelled') {
+                  updateCandidateStatus('Cancelled interview');
+                }
+              }}
+
             />
           </Form.Item>
+          {showResult && (
+            <Form.Item
+              name="result"
+              label="Result:"
+              className="w-1/3"
+              rules={[{ required: true, message: 'Please select result' }]}
+            >
+              <Select
+                options={resultOptions}
+                onChange={(value) => {
+                  // Update candidate status based on result
+                  updateCandidateStatus(value === 'Passed' ? 'Passed interview' : 'Banned');
+                }}
+              />
+            </Form.Item>
+          )}
         </div>
         <Form.Item
           name="schedule_date"

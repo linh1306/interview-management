@@ -30,9 +30,9 @@ const columns = [
     key: 'email',
   },
   {
-    title: 'Phone No',
-    dataIndex: 'phone',
-    key: 'phone',
+    title: 'Department',  // Đổi title từ 'Phone No' thành 'Department'
+    dataIndex: 'department',  // Đổi dataIndex từ 'phone' thành 'department'
+    key: 'department',    // Đổi key từ 'phone' thành 'department'
   },
   {
     title: 'Role',

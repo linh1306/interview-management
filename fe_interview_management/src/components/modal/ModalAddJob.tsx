@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
+import { useEffect, useState } from "react";
 import { JobLevel, JobStatus, UserDepartment } from "@/configs/constants.tsx";
 import { Skill } from "@/interfaces/job.interface.ts";
 import { createJob, getJobs, updateJob } from "@/redux/features/jobSlice.ts";
@@ -16,6 +17,57 @@ export const ModalAddJob = (props: any) => {
   const benefitsOptions = benefits.map((benefit) => ({ label: benefit.name, value: benefit.id }));
   const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({ label: value, value: key }));
   const [form] = Form.useForm();
+  const [department, setDepartment] = useState(null)
+  const [position, setPosition] = useState([]);
+const positionOptions = position.map((pos) => ({ label: pos, value: pos }));
+
+const handleChooseDepartment = (val) => {
+  setDepartment(val);
+};
+
+useEffect(() => {
+  const getPositions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://103.56.158.135:8086/api/v1/request', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Thêm token vào header Authorization
+          'Accept': 'application/json' // Đảm bảo yêu cầu này trả về JSON
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch positions');
+      }
+
+      const responseData = await response.json();
+
+      // Lọc các vị trí có trạng thái "Approved"
+      const approvedPositions = responseData.data.results
+        .filter((val) => val.status === "Approved"  && val.department === department )
+        .map((val) => val.position);
+
+      // Cập nhật state position với danh sách đã lọc
+      setPosition(approvedPositions);
+    } catch (error) {
+      console.error('Error fetching positions:', error);
+    }
+  };
+
+  if (department) {
+    getPositions(); // Chỉ gọi khi department có giá trị
+  }
+}, [department]);
+
+console.log("Position Options:", positionOptions);
+
+
   const selectAfter = (
     <Select style={{ width: 60 }} options={[{
       value: 'USD',
@@ -42,10 +94,9 @@ export const ModalAddJob = (props: any) => {
       open={isOpen}
       onOk={() => { form.resetFields(); }}
       onCancel={() => {
-        form.resetFields(); // Reset form khi đóng modal
+        form.resetFields();
         handleClose();
       }}
-
       footer={[]}
       className="text-xl"
       width={900}
@@ -73,6 +124,26 @@ export const ModalAddJob = (props: any) => {
         labelCol={{ span: 6 }}
         key={initialValues}
       >
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="department"
+            label="Department:"
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please select department' }]}
+          >
+            <Select options={departmentOptions} onChange = {(val) => handleChooseDepartment(val)}/>
+          </Form.Item>
+          <Form.Item
+            name="position"
+            label="Position:"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please enter position' }]}
+          >
+           <Select options={positionOptions} />
+{console.log("Position Options:", positionOptions)}
+          </Form.Item>
+        </div>
+
         <div className="w-full flex justify-between">
           <Form.Item
             name="title"
@@ -166,65 +237,39 @@ export const ModalAddJob = (props: any) => {
             />
           </Form.Item>
         </div>
+
         <div className="w-full flex justify-between">
-          <Form.Item
-            name="benefits"
-            label="Benefit:"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please select gender' }]}
-          >
-            <Select
-              data-testid="select-job-benefits"
-              options={benefitsOptions}
-              mode='tags'
-            />
-          </Form.Item>
           <Form.Item
             name="level"
             label="Level"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please select department' }]}
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please select level' }]}
           >
             <Select
               options={jobLevelOptions}
               mode='multiple'
             />
           </Form.Item>
-        </div>
-        <div className="w-full flex justify-between">
           <Form.Item
             name="status"
             label="Status"
-            className="w-1/2 mr-5"
+            className="w-1/2"
             rules={[{ required: true, message: 'Please select status' }]}
           >
             <Select options={statusOptions} />
           </Form.Item>
-          <Form.Item
-            name="working_address"
-            label="Address"
-            className="w-1/2"
-          >
-            <Input />
-          </Form.Item>
         </div>
+
         <div className="w-full flex justify-between">
-          <Form.Item
-            name="department"
-            label="Department"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please select department' }]}
-          >
-            <Select options={departmentOptions} />
-          </Form.Item>
           <Form.Item
             name="description"
             label="Description"
-            className="w-1/2"
+            className="w-full"
           >
             <Input />
           </Form.Item>
         </div>
+
         <div className="w-full flex justify-end gap-x-5 mt-5">
           <Form.Item>
             <button

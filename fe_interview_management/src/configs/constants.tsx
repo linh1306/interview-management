@@ -82,7 +82,6 @@ export const OfferPositionByDepartment: Record<UserDepartment, { value: string; 
 export enum JobStatus {
   Closed = 'Closed',
   Open = 'Open',
-  Draft = 'Draft',
 }
 
 export enum JobLevel {

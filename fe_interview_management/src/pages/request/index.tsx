@@ -43,11 +43,6 @@ export const RequestPage = () => {
     const [loading, setLoading] = useState(false);
     const { message: messageApi } = App.useApp();
     const columns = [
-        // {
-        //     title: 'ID',
-        //     dataIndex: 'id',
-        //     key: 'id',
-        // },
         {
             title: 'Position',
             dataIndex: 'position',

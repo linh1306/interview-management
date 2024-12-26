@@ -19,7 +19,7 @@ export enum OfferLevel {
 }
 
 export enum OfferPosition {
-  Be = 'Backend Developers',
+  Be = 'Backend Developer',
   Ba = 'Bussiness Analyst',
   // HR Department
   HrManager = 'HR Manager',
@@ -44,6 +44,7 @@ export enum OfferPosition {
   FullstackDeveloper = 'Fullstack Developer',
   Tester = 'Tester',
   QualityInspector = 'Quality Inspector',
+  Devops = 'Devops',
 
   // Marketing Department
   MarketingManager = 'Marketing Manager',

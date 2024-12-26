@@ -13,7 +13,6 @@ export const ModalAddInterview = (props: any) => {
   const candidates = useAppSelector((state) => state.candidate.candidates);
   const users = useAppSelector((state) => state.user.users);
   const userOptions = useMemo(() => users?.filter(it => it.role !== "HR").map((user) => ({ label: user.username, value: user.id })), [users]);
-  // const candidateOptions = useMemo(() => candidates?.filter(it => it.status === 'Open').map((candidate) => ({ label: candidate.full_name, value: candidate.id })), [candidates]);
   const candidateOptions = useMemo(() => candidates?.map((candidate) => ({
     label: `${candidate.full_name} (${candidate.email})`,
     value: candidate.id
@@ -84,17 +83,48 @@ export const ModalAddInterview = (props: any) => {
     const status = form.getFieldValue('status');
     setShowResult(status === 'Interviewed');
   }, [form.getFieldValue('status')]);
-  const updateCandidateStatus = async (status) => {
-    const candidateId = selectedCandidateId.value || initialValues?.candidate_id;
-    console.log('selectedCandidateId: ', selectedCandidateId)
-    console.log('initialValues?.candidate_id: ', initialValues?.candidate_id)
-    if (candidateId) {
+  const handleFormSubmit = async (data) => {
+    const selectedJobData = jobs.find(job => job.id === data.job_id.value || data.job_id);
+    const { result, ...rest } = data;
+
+    const payload = {
+      ...rest,
+      candidate_id: data.candidate_id.value || data.candidate_id,
+      job_id: data.job_id.value || data.job_id,
+      interviewer_ids: data.interviewer_ids.map((it: any) => it.value || it),
+      position: selectedJobData?.position,
+      status: data.status === 'Interviewed' ? data.result : data.status
+    };
+
+    // NEW: Update candidate status only on form submission
+    if (data.candidate_id) {
+      const candidateId = data.candidate_id.value || data.candidate_id;
+      let newStatus;
+
+      if (data.status === 'Interviewed') {
+        newStatus = data.result === 'Passed' ? 'Passed interview' : 'Banned';
+      } else if (data.status === 'Invited') {
+        newStatus = 'Waiting for interview';
+      } else if (data.status === 'Cancelled') {
+        newStatus = 'Cancelled interview';
+      }
+
       await dispatch(updateCandidate({
         id: candidateId,
-        payload: { status }
+        payload: { status: newStatus }
       }));
     }
+
+    if (initialValues) {
+      await dispatch(updateInterview({ payload: payload, id: initialValues.id }));
+    } else {
+      await dispatch(createInterview(payload));
+    }
+
+    await dispatch(getInterviews({}));
+    handleClose();
   };
+
 
   console.log('candidates: ', candidates);
   console.log('jobs: ', jobs);
@@ -113,31 +143,7 @@ export const ModalAddInterview = (props: any) => {
         name="layout-multiple-horizontal"
         layout="horizontal"
         className="w-full mt-10"
-        onFinish={async (data) => {
-          const selectedJobData = jobs.find(job => job.id === data.job_id.value || data.job_id);
-          const { result, ...rest } = data;
-          const payload = {
-            ...rest,
-            candidate_id: data.candidate_id.value || data.candidate_id,
-            job_id: data.job_id.value || data.job_id,
-            interviewer_ids: data.interviewer_ids.map((it: any) => it.value || it),
-            position: selectedJobData?.position,
-            status: data.status === 'Interviewed' ? data.result : data.status
-          };
-
-          const status = data.status;
-          if (status === 'Interviewed') {
-            await updateCandidateStatus(data.result === 'Passed' ? 'Passed interview' : 'Banned');
-          }
-
-          if (initialValues) {
-            await dispatch(updateInterview({ payload: payload, id: initialValues.id }));
-          } else {
-            await dispatch(createInterview(payload));
-          }
-          await dispatch(getInterviews({}));
-          handleClose();
-        }}
+        onFinish={handleFormSubmit}
         initialValues={initialValues || { status: 'Invited' }}
         labelCol={{ span: 6 }}
         key={initialValues}
@@ -190,17 +196,6 @@ export const ModalAddInterview = (props: any) => {
               notFoundContent="No candidate found"
             />
           </Form.Item>
-          {/* <Form.Item
-            name="position"
-            label="Position:"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please enter position' }]}
-          >
-            <Select
-              data-testid="select-interview-position"
-              options={positionOptions}
-            />
-          </Form.Item> */}
         </div>
         <div className="w-full flex justify-between">
           <Form.Item
@@ -226,11 +221,6 @@ export const ModalAddInterview = (props: any) => {
               options={statusOptions}
               onChange={(value) => {
                 setShowResult(value === 'Interviewed');
-                if (value === 'Invited') {
-                  updateCandidateStatus('Waiting for interview');
-                } else if (value === 'Cancelled') {
-                  updateCandidateStatus('Cancelled interview');
-                }
               }}
 
 
@@ -245,10 +235,6 @@ export const ModalAddInterview = (props: any) => {
             >
               <Select
                 options={resultOptions}
-                onChange={(value) => {
-                  // Update candidate status based on result
-                  updateCandidateStatus(value === 'Passed' ? 'Passed interview' : 'Banned');
-                }}
               />
             </Form.Item>
           )}

@@ -3,11 +3,13 @@ import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { useEffect, useMemo, useState } from "react";
 import { OfferStatus, OfferType, UserDepartment } from "@/configs/constants.tsx";
-import { createOffer, getOffers, updateOffer } from "@/redux/features/offerSlice.ts";
+import { createOffer, getOffers, updateOffer, deleteOffer } from "@/redux/features/offerSlice.ts";
 import { useAuth } from "@/redux/hooks.ts";
 import moment from "moment";
 import { OfferPositionByDepartment } from '@/configs/constants.tsx'
 import { useForm } from "antd/es/form/Form";
+
+
 
 export const ModalAddOffer = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
@@ -60,6 +62,7 @@ export const ModalAddOffer = (props: any) => {
 
   const [form] = useForm();
   const dispatch = useAppDispatch();
+
 
   const handleChooseDepartment = (value) => {
     setDepartment(value);

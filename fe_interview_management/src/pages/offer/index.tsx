@@ -10,9 +10,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks.ts";
 import { getUsers } from "@/redux/features/userSlice.ts";
 import { getCandidates } from "@/redux/features/candidateSlice.ts";
 import { getInterviews } from "@/redux/features/interviewSlice.ts";
-import { getOffers } from "@/redux/features/offerSlice.ts";
 import moment from "moment";
 import dayjs from "dayjs";
+import { createOffer, getOffers, updateOffer, deleteOffer } from "@/redux/features/offerSlice.ts";
 const statusOptions = Object.entries(OfferStatus).map(([key, value]) => ({ label: value, value: value }));
 const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({ label: value, value: value }));
 const columns = [
@@ -80,6 +80,10 @@ export const OfferPage = () => {
     setSelectedOffer(undefined);
     setIsModalVisible(false);
   }
+  const handleDeleteOffer = async (record: any) => {
+    await dispatch(deleteOffer(record.id));
+    dispatch(getOffers({})); // Refresh lại danh sách sau khi xóa
+  };
 
   return (
     <div className="p-10 bg-white h-full rounded">
@@ -142,6 +146,7 @@ export const OfferPage = () => {
             });
             setIsModalVisible(true);
           }}
+          onDeleteItem={handleDeleteOffer}
         />
       </div>
     </div>

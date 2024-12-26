@@ -41,6 +41,19 @@ export const updateOffer = createAsyncThunk(
   }
 );
 
+export const deleteOffer = createAsyncThunk(
+  "offer/deleteOffer",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await offerApi.deleteOffer(id);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+
 export interface OfferState {
   offers: any[];
   error: ErrorResponse | null;
@@ -59,35 +72,38 @@ const jobSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-        .addCase(getOffers.fulfilled, (state, action) => {
-          if (action.payload == null) return;
-          state.offers = action.payload.results;
-        })
-        .addCase(createOffer.fulfilled, (state, action) => {
-          toast("Create offer successfully");
-        })
-        .addCase(updateOffer.fulfilled, (state, action) => {
-          toast("Update offer successfully");
-        })
-        .addMatcher(
-            (action) =>
-                action.type.startsWith("offer/") && action.type.includes("/rejected"),
-            (state, action) => {
-              state.error = {
-                message: action.payload?.message ?? action.error.message,
-                errorCode: action.payload?.errorCode ?? action.error.code,
-              };
-              state.loading = LoadingStatus.Rejected;
-              toast.error(state.error.message, toastOption);
-            }
-        )
-        .addMatcher(
-            (action) => action.type.includes("fulfilled"),
-            (state, _) => {
-              state.error = null;
-              state.loading = LoadingStatus.Fulfilled;
-            }
-        );
+      .addCase(getOffers.fulfilled, (state, action) => {
+        if (action.payload == null) return;
+        state.offers = action.payload.results;
+      })
+      .addCase(createOffer.fulfilled, (state, action) => {
+        toast("Create offer successfully");
+      })
+      .addCase(updateOffer.fulfilled, (state, action) => {
+        toast("Update offer successfully");
+      })
+      .addCase(deleteOffer.fulfilled, (state, action) => {
+        toast("Delete offer successfully"); // Thêm toast thông báo khi xóa thành công
+      })
+      .addMatcher(
+        (action) =>
+          action.type.startsWith("offer/") && action.type.includes("/rejected"),
+        (state, action) => {
+          state.error = {
+            message: action.payload?.message ?? action.error.message,
+            errorCode: action.payload?.errorCode ?? action.error.code,
+          };
+          state.loading = LoadingStatus.Rejected;
+          toast.error(state.error.message, toastOption);
+        }
+      )
+      .addMatcher(
+        (action) => action.type.includes("fulfilled"),
+        (state, _) => {
+          state.error = null;
+          state.loading = LoadingStatus.Fulfilled;
+        }
+      );
   },
 });
 export default jobSlice.reducer;

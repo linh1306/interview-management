@@ -1,6 +1,6 @@
 import Api from "./api";
-import {ApiListResponse, ApiResponse} from "@/vite-env";
-import {IJob} from "@/interfaces/job.interface.ts";
+import { ApiListResponse, ApiResponse } from "@/vite-env";
+import { IJob } from "@/interfaces/job.interface.ts";
 
 class OfferApi {
   private baseUrl: string;
@@ -18,6 +18,9 @@ class OfferApi {
 
   async updateOffer(data: any, id: number): Promise<ApiListResponse<IJob>> {
     return Api.PATCH<ApiListResponse<IJob>>(this.baseUrl + `/${id}`, data);
+  }
+  async deleteOffer(id: number): Promise<ApiListResponse<IJob>> {
+    return Api.DELETE<ApiListResponse<IJob>>(`${this.baseUrl}/${id}`);
   }
 }
 

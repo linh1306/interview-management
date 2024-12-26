@@ -11,12 +11,9 @@ import { OfferPositionByDepartment } from '@/configs/constants.tsx';
 const { RangePicker } = DatePicker;
 
 const LevelOptions = [
-    'Fresher',
     'Junior',
     'Middle',
     'Senior',
-    'Lead',
-    'Manager'
 ];
 
 const WorkplaceOptions = [
@@ -173,7 +170,7 @@ export const ModalAddRequest = (props: any) => {
 
                             disabled={!department}
                             placeholder={department ? "Select position" : "Please select department first"}
-                            
+
                         />
                     </Form.Item>
 

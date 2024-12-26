@@ -20,6 +20,15 @@ export const ModalAddInterview = (props: any) => {
   })), [candidates]);
   const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+
+  // Cập nhật khi select candidate hoặc khi edit
+  useEffect(() => {
+    if (initialValues) {
+      setSelectedCandidateId(initialValues.candidate_id);
+    }
+  }, [initialValues]);
+
 
   // Thêm useEffect để lọc candidates khi job thay đổi
   useEffect(() => {
@@ -63,12 +72,22 @@ export const ModalAddInterview = (props: any) => {
 
   // Thêm watch cho status field
   const [form] = Form.useForm();
+  const candidateValue = Form.useWatch('candidate_id', form);
+  const statusValue = Form.useWatch('status', form);
+
+  useEffect(() => {
+    console.log('Watched candidate_id:', candidateValue);
+    console.log('Watched status:', statusValue);
+  }, [candidateValue, statusValue]);
+
   useEffect(() => {
     const status = form.getFieldValue('status');
     setShowResult(status === 'Interviewed');
   }, [form.getFieldValue('status')]);
   const updateCandidateStatus = async (status) => {
-    const candidateId = form.getFieldValue('candidate_id')?.value;
+    const candidateId = selectedCandidateId.value || initialValues?.candidate_id;
+    console.log('selectedCandidateId: ', selectedCandidateId)
+    console.log('initialValues?.candidate_id: ', initialValues?.candidate_id)
     if (candidateId) {
       await dispatch(updateCandidate({
         id: candidateId,
@@ -76,6 +95,7 @@ export const ModalAddInterview = (props: any) => {
       }));
     }
   };
+
   console.log('candidates: ', candidates);
   console.log('jobs: ', jobs);
   return (
@@ -163,6 +183,7 @@ export const ModalAddInterview = (props: any) => {
               data-testid="select-interview-candidate"
               placeholder="Select candidate"
               showSearch
+              onChange={(value) => setSelectedCandidateId(value)}
               filterOption={(input, option) =>
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
               }
@@ -211,6 +232,7 @@ export const ModalAddInterview = (props: any) => {
                   updateCandidateStatus('Cancelled interview');
                 }
               }}
+
 
             />
           </Form.Item>

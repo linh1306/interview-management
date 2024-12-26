@@ -16,7 +16,14 @@ export const ModalAddCandidate = (props: any) => {
   const skills = useAppSelector((state) => state.job.skills);
   const skillsOptions = skills.map((skill: Skill) => ({ label: skill.name, value: skill.id }));
   const highestLevelOptions = HighestLevelCandidate.map((level) => ({ label: level, value: level }));
-  const statusOptions = Object.entries(CandidateStatus).map(([key, value]) => ({ label: value, value: value }));
+  const defaultStatus = "Waiting for interview";
+
+  const statusOptions = Object.entries(CandidateStatus).map(([key, value]) => ({
+    label: value,
+    value: value,
+    default: value === defaultStatus // Thêm property default
+  }));
+
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
   const [fileList, setFileList] = useState<any>([]);
   const [form] = Form.useForm();
@@ -285,11 +292,13 @@ export const ModalAddCandidate = (props: any) => {
             name="status"
             label="Status"
             className="w-1/2"
+            initialValue="Waiting for interview"
             rules={[{ required: true, message: 'Please select status' }]}
           >
             <Select
               data-testid="select-status"
               options={statusOptions}
+              defaultValue={defaultStatus}
             />
           </Form.Item>
         </div>

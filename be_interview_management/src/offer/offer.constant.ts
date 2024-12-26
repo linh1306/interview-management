@@ -1,9 +1,17 @@
-export enum OfferType {
+export enum WorkingType {
   Trial2Months = 'Trial 2 months',
   Trainee = 'Trainee 3 months',
   OneYear = 'One Year',
   Three = 'Three years',
   Unlimited = 'Unlimited',
+}
+
+export enum OfferType {
+  Fulltime = 'Full-time',
+  Parttime = 'Part-time',
+  Remote = 'Remote',
+  Onsite = 'On-site',
+  Hybrid = 'Hybrid'
 }
 
 export enum OfferLevel {

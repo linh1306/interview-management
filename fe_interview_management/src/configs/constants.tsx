@@ -18,10 +18,10 @@ export enum UserRole {
 export enum UserDepartment {
   IT = 'IT',
   HR = 'HR',
-  Finance = 'Finance',
-  Communication = 'Communication',
+  AF = 'AF', // Thêm AF thay cho Finance
   Marketing = 'Marketing',
-  Accounting = 'Accounting',
+  Purchasing = 'Purchasing', // Thêm Purchasing thay cho Communication 
+  PR = 'PR' // Thêm PR thay cho Accounting
 }
 export const OfferPosition = [
   'Backend Developer',
@@ -33,6 +33,7 @@ export const OfferPosition = [
   'Fullstack Developer',
   'Devops',
 ]
+
 export const OfferPositionByDepartment: Record<UserDepartment, { value: string; label: string }[]> = {
   [UserDepartment.HR]: [
     { value: 'hr_manager', label: 'HR Manager' },
@@ -146,7 +147,7 @@ export const CandidateStatus = [
 ]
 
 export enum InterviewStatus {
-//   Open = 'Open',
+  //   Open = 'Open',
   Invited = 'Invited',
   Interviewed = 'Interviewed',
   Cancelled = 'Cancelled',
@@ -172,9 +173,9 @@ export enum OfferLevel {
 }
 
 export enum OfferType {
-  Trial2Months = 'Trial 2 months',
-  Trainee = 'Trainee 3 months',
-  OneYear = 'One Year',
-  Three = 'Three years',
-  Unlimited = 'Unlimited',
+  Fulltime = 'Full-time',
+  Parttime = 'Part-time',
+  Remote = 'Remote',
+  Onsite = 'On-site',
+  Hybrid = 'Hybrid'  // Thêm tùy chọn Hybrid vì đây cũng là hình thức làm việc phổ biến
 }

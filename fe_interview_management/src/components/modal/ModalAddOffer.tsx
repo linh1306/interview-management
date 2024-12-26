@@ -6,7 +6,7 @@ import { OfferStatus, OfferType, UserDepartment } from "@/configs/constants.tsx"
 import { createOffer, getOffers, updateOffer } from "@/redux/features/offerSlice.ts";
 import { useAuth } from "@/redux/hooks.ts";
 import moment from "moment";
-import {OfferPositionByDepartment} from '@/configs/constants.tsx'
+import { OfferPositionByDepartment } from '@/configs/constants.tsx'
 import { useForm } from "antd/es/form/Form";
 
 export const ModalAddOffer = (props: any) => {
@@ -22,16 +22,31 @@ export const ModalAddOffer = (props: any) => {
   const statusOptions = Object.values(OfferStatus).map((status) => ({ label: status, value: status }));
   const [department, setDepartment] = useState(null)
   const [positionOptionsByDept, setPositionOptionsByDept] = useState<any[]>([]);
-useEffect(() => {
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
 
-  if (department) {
-    setPositionOptionsByDept(OfferPositionByDepartment[department]);
-  } else {
-    setPositionOptionsByDept([]);
-  }
-  console.log(positionOptionsByDept)
-  console.log(candidateOptions)
-}, [department]);
+  useEffect(() => {
+
+    if (department) {
+      setPositionOptionsByDept(OfferPositionByDepartment[department]);
+      const filtered = candidates.filter(candidate =>
+        candidate.department === department &&
+        candidate.status === "Passed interview"  // Thêm điều kiện này
+      );
+
+      // Chuyển đổi sang format options cho Select
+      const options = filtered.map(candidate => ({
+        label: candidate.full_name,
+        value: candidate.id
+      }));
+      setFilteredCandidates(options);
+    } else {
+      setPositionOptionsByDept([]);
+      setFilteredCandidates([]);
+    }
+    console.log(positionOptionsByDept)
+    console.log(candidateOptions)
+    console.log('candidates: ', candidates)
+  }, [department, candidates]);
   const { user } = useAuth();
   const departmentOptions = useMemo(() => {
     if (user?.role === "Manager") {
@@ -76,10 +91,14 @@ useEffect(() => {
         layout="horizontal"
         className="w-full mt-10"
         onFinish={async (data) => {
+          const { candidate, ...rest } = data;
           const payload = {
-            ...data,
-            candidate_id: data.candidate_id?.value || data.candidate_id,
+            ...rest,
+            candidate_id: data.candidate?.value || data.candidate,
             manager_id: data.manager_id?.value || data.manager_id,
+            interview_schedule_id: 1,
+            position: data.position || "Backend Developer",
+            level: data.level || "Junior 2.1",
           };
           if (initialValues) {
             await dispatch(updateOffer({ payload, id: initialValues.id }));
@@ -100,40 +119,41 @@ useEffect(() => {
             className="w-1/2"
             rules={[{ required: true, message: "Please select a department" }]}
           >
-            <Select options={departmentOptions} onChange={(val) =>handleChooseDepartment(val)} />
+            <Select options={departmentOptions} onChange={(val) => handleChooseDepartment(val)} />
           </Form.Item>
-         <Form.Item
-  name="candidate"
-  label="Candidate:"
-  className="w-1/2 mr-5"
-  rules={[
-    { required: true, message: 'Please choose a candidate' },
-    ({ getFieldValue }) => ({
-      validator(_, value) {
-        if (!getFieldValue('department')) {
-          return Promise.reject(new Error('Please choose the department first'));
-        }
-        return Promise.resolve();
-      },
-    }),
-  ]}
->
-  <Select
-    data-testid="select-position"
-    options={department ? candidateOptions : []}
+          <Form.Item
+            name="candidate"
+            label="Candidate:"
+            className="w-1/2 mr-5"
+            rules={[
+              { required: true, message: 'Please choose a candidate' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!getFieldValue('department')) {
+                    return Promise.reject(new Error('Please choose the department first'));
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <Select
+              data-testid="select-position"
+              // options={department ? candidateOptions : []}
+              options={filteredCandidates}
 
-    onClick={() => {
-      if (department) {
-        form.setFields([
-          {
-            name: 'candidate',
-            errors: ['Please choose the department first'],
-          },
-        ]);
-      }
-    }}
-  />
-</Form.Item>
+              onClick={() => {
+                if (!department) {
+                  form.setFields([
+                    {
+                      name: 'candidate',
+                      errors: ['Please choose the department first'],
+                    },
+                  ]);
+                }
+              }}
+            />
+          </Form.Item>
         </div>
 
 
@@ -155,100 +175,100 @@ useEffect(() => {
             name="status"
             label="Status:"
             className="w-1/2"
+            initialValue="Waiting for approval"
             rules={[{ required: true, message: 'Please enter status' }]}
           >
             <Select
               data-testid="select-offer-status"
-               defaultValue="Waiting for approval"
-                options={statusOptions}
+              options={statusOptions}
             />
           </Form.Item>
         </div>
-<div className="w-full flex justify-between">
-  <Form.Item
-    name="contract_type"
-    label="Type:"
-    className="w-1/2 mr-5"
-    rules={[{ required: true, message: 'Please enter type' }]}
-  >
-    <Select
-      data-testid="select-offer-contract"
-      options={offerTypeOptions}
-    />
-  </Form.Item>
-  <Form.Item
-    name="contract_to"
-    label="Contract To:"
-    className="w-1/2"
-    rules={[{ required: true, message: 'Please enter time' }]}
-  >
-    <DatePicker
-      data-testid="select-offer-to"
-      className="w-full"
-      disabledDate={(current) => current && current < moment().startOf('day')}
-    />
-  </Form.Item>
-</div>
-<div className="w-full flex justify-between">
-  <Form.Item
-    name="contract_from"
-    label="Contract From:"
-    className="w-1/2 mr-5"
-    rules={[{ required: true, message: 'Please enter time' }]}
-  >
-    <DatePicker
-      data-testid="select-offer-from"
-      className="w-full"
-      disabledDate={(current) => current && current < moment().startOf('day')}
-    />
-  </Form.Item>
-  <Form.Item
-    name="basic_salary"
-    label="Basic Salary:"
-    className="w-1/2"
-    rules={[{ required: true, message: 'Please enter salary' }]}
-  >
-    <InputNumber
-      data-testid="input-offer-salary"
-      addonAfter={
-        <Form.Item name="currency" noStyle>
-          {<Select style={{ width: 60 }} options={[{
-            value: 'USD',
-            label: '$'
-          },
-          {
-            value: 'EUR',
-            label: '€'
-          },
-          {
-            value: 'GBP',
-            label: '£'
-          },
-          {
-            value: 'CNY',
-            label: '¥'
-          }]} />}
-        </Form.Item>
-      }
-      step={100}
-      className="w-full"
-      placeholder={"Enter salary from"}
-    />
-  </Form.Item>
-</div>
-<div className="w-full flex justify-between">
-  <Form.Item
-    name="note"
-    label="Note:"
-    className="w-full"
-  >
-    <Input
-      data-testid="input-offer-note"
-      allowClear
-      placeholder={"Enter note"}
-    />
-  </Form.Item>
-</div>
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="contract_type"
+            label="Type:"
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please enter type' }]}
+          >
+            <Select
+              data-testid="select-offer-contract"
+              options={offerTypeOptions}
+            />
+          </Form.Item>
+          <Form.Item
+            name="contract_to"
+            label="Contract To:"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please enter time' }]}
+          >
+            <DatePicker
+              data-testid="select-offer-to"
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
+            />
+          </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="contract_from"
+            label="Contract From:"
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please enter time' }]}
+          >
+            <DatePicker
+              data-testid="select-offer-from"
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
+            />
+          </Form.Item>
+          <Form.Item
+            name="basic_salary"
+            label="Basic Salary:"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please enter salary' }]}
+          >
+            <InputNumber
+              data-testid="input-offer-salary"
+              addonAfter={
+                <Form.Item name="currency" noStyle>
+                  {<Select style={{ width: 60 }} options={[{
+                    value: 'USD',
+                    label: '$'
+                  },
+                  {
+                    value: 'EUR',
+                    label: '€'
+                  },
+                  {
+                    value: 'GBP',
+                    label: '£'
+                  },
+                  {
+                    value: 'CNY',
+                    label: '¥'
+                  }]} />}
+                </Form.Item>
+              }
+              step={100}
+              className="w-full"
+              placeholder={"Enter salary from"}
+            />
+          </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="note"
+            label="Note:"
+            className="w-full"
+          >
+            <Input
+              data-testid="input-offer-note"
+              allowClear
+              placeholder={"Enter note"}
+            />
+          </Form.Item>
+        </div>
 
         <div className="w-full flex justify-end gap-x-5 mt-5">
           <Form.Item>

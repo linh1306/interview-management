@@ -19,14 +19,50 @@ export enum OfferLevel {
 }
 
 export enum OfferPosition {
-  Be = 'Backend Developer',
+  Be = 'Backend Developers',
   Ba = 'Bussiness Analyst',
+  // HR Department
+  HrManager = 'HR Manager',
+  RecruitmentSpecialist = 'Recruitment Specialist',
+  TrainingSpecialist = 'Training Specialist',
+  AdministrativeSpecialist = 'Administrative Specialist',
+
+  // A&F Department
+  ChiefAccountant = 'Chief Accountant',
+  AccountantSpecialist = 'Accountant Specialist',
+  FinancialSpecialist = 'Financial Specialist',
+  Cashier = 'Cashier',
+  LegalManager = 'Legal Manager',
+  ContractSpecialist = 'Contract Specialist',
+
+  // IT Department
+  ItManager = 'IT Manager',
+  SoftwareEngineer = 'Software Engineer',
+  SystemEngineer = 'System Engineer',
+  BackendDeveloper = 'Backend Developer',
+  FrontendDeveloper = 'Frontend Developer',
+  FullstackDeveloper = 'Fullstack Developer',
   Tester = 'Tester',
-  Hr = 'HR',
-  Pm = 'Project Manager',
-  Fe = 'Frontend Developer',
-  Fullstack = 'Fullstack Developer',
-  Devops = 'Devops',
+  QualityInspector = 'Quality Inspector',
+
+  // Marketing Department
+  MarketingManager = 'Marketing Manager',
+  SalesExecutive = 'Sales Executive',
+  BusinessExecutive = 'Business Executive',
+  ContentMarketing = 'Content Marketing',
+  ContentCreator = 'Content Creator',
+
+  // Purchasing Department
+  PurchasingManager = 'Purchasing Manager',
+  SourcingSpecialist = 'Sourcing Specialist',
+  WarehouseStaff = 'Warehouse Staff',
+  SupplyChainSpecialist = 'Supply Chain Specialist',
+
+  // PR Department
+  PrManager = 'PR Manager',
+  PrExecutive = 'PR Executive',
+  MediaSpecialist = 'Media Specialist',
+  EventSpecialist = 'Event Specialist',
 }
 
 export enum OfferStatus {

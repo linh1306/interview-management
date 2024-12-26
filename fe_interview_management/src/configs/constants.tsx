@@ -35,30 +35,30 @@ export const OfferPosition = [
 ]
 export const OfferPositionByDepartment: Record<UserDepartment, { value: string; label: string }[]> = {
   [UserDepartment.IT]: [
-    { value: 'backend_developer', label: 'Backend Developer' },
-    { value: 'frontend_developer', label: 'Frontend Developer' },
-    { value: 'fullstack_developer', label: 'Fullstack Developer' },
-    { value: 'devops', label: 'DevOps' },
+    { value: 'Backend Developer', label: 'Backend Developer' },
+    { value: 'Frontend Developer', label: 'Frontend Developer' },
+    { value: 'Fullstack Developer', label: 'Fullstack Developer' },
+    { value: 'DevOps', label: 'DevOps' },
   ],
   [UserDepartment.HR]: [
-    { value: 'hr_manager', label: 'HR Manager' },
-    { value: 'recruiter', label: 'Recruiter' },
+    { value: 'HR Manager', label: 'HR Manager' },
+    { value: 'Recruiter', label: 'Recruiter' },
   ],
   [UserDepartment.Finance]: [
-    { value: 'financial_analyst', label: 'Financial Analyst' },
-    { value: 'accountant', label: 'Accountant' },
+    { value: 'Financial Analyst', label: 'Financial Analyst' },
+    { value: 'Accountant', label: 'Accountant' },
   ],
   [UserDepartment.Communication]: [
-    { value: 'pr_manager', label: 'PR Manager' },
-    { value: 'content_specialist', label: 'Content Specialist' },
+    { value: 'PR Manager', label: 'PR Manager' },
+    { value: 'Content Specialist', label: 'Content Specialist' },
   ],
   [UserDepartment.Marketing]: [
-    { value: 'marketing_manager', label: 'Marketing Manager' },
-    { value: 'seo_specialist', label: 'SEO Specialist' },
+    { value: 'Marketing Manager', label: 'Marketing Manager' },
+    { value: 'SEO Specialist', label: 'SEO Specialist' },
   ],
   [UserDepartment.Accounting]: [
-    { value: 'auditor', label: 'Auditor' },
-    { value: 'accounting_manager', label: 'Accounting Manager' },
+    { value: 'Auditor', label: 'Auditor' },
+    { value: 'Accounting Manager', label: 'Accounting Manager' },
   ],
 };
 

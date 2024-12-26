@@ -62,8 +62,15 @@ export const ModalAddCandidate = (props: any) => {
         layout="horizontal"
         className="w-full mt-10"
         onFinish={async (data) => {
-          const skills = data.skills.map(it => it.value || it);
-          const payload = { ...data, dob: data.dob.format("YYYY-MM-DD"), file: data?.attach_file?.fileList ? data?.attach_file?.fileList[0] : undefined, skills };
+          const skills = data.skills ? data.skills.map(it => it.value || it) : ['fullstack'];
+          const payload = {
+            ...data,
+            dob: data.dob ? data.dob.format("YYYY-MM-DD") : '2024-12-26',  // Thêm kiểm tra dob
+            file: data?.attach_file?.fileList ? data?.attach_file?.fileList[0] : undefined,
+            gender: 'Male',
+            skills
+          };
+
           delete payload.attach_file;
           if (!payload.file) {
             delete payload.file;

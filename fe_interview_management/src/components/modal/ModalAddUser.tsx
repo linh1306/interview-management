@@ -28,6 +28,10 @@ export const ModalAddUser = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
+  const defaultValues = {
+    status: UserStatus.Active // Set default status to active
+  };
+
   return (
     <Modal
       title={initialValues ? "EDIT USER" : "ADD USER"}
@@ -68,15 +72,18 @@ export const ModalAddUser = (props: any) => {
           } else {
             const payload = {
               ...data,
-              dob: formatDob(data.dob)
+              dob: formatDob(data.dob),
+              phone: data.phone || '0814117539', // giá trị mặc định cho phone
+              gender: data.gender || 'Male', // giá trị mặc định cho gender
             };
+
 
             await dispatch(createUser(payload));
             form.resetFields();
             handleClose();
           }
         }}
-        initialValues={initialValues}
+        initialValues={defaultValues}
         labelCol={{ span: 6 }}
         key={initialValues}
       >
@@ -91,7 +98,7 @@ export const ModalAddUser = (props: any) => {
               allowClear
               placeholder={"Enter full name"}
             />
-          
+
           </Form.Item>
           {/* <Form.Item
             name="email"
@@ -105,14 +112,27 @@ export const ModalAddUser = (props: any) => {
             />
           </Form.Item> */}
 
-          
+
         </div>
         <div className="w-full flex justify-between">
-         <Form.Item
+          <Form.Item
+            name="email"
+            label="Email:"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please enter email' }]}
+          >
+            <Input
+              allowClear
+              placeholder={"Enter email"}
+            />
+          </Form.Item>
+        </div>
+        <div className="w-full flex justify-between">
+          <Form.Item
             name="username"
             label="Username"
             className="w-1/2"
-           
+
 
           >
             <Input />

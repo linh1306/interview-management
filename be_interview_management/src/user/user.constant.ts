@@ -14,8 +14,8 @@ export enum UserRole {
 export enum UserDepartment {
   IT = 'IT',
   HR = 'HR',
-  Finance = 'Finance',
-  Communication = 'Communication',
+  AF = 'AF', // Thêm AF thay cho Finance
   Marketing = 'Marketing',
-  Accounting = 'Accounting',
+  Purchasing = 'Purchasing', // Thêm Purchasing thay cho Communication
+  PR = 'PR'
 }

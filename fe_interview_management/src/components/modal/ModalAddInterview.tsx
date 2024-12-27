@@ -12,7 +12,7 @@ export const ModalAddInterview = (props: any) => {
   const jobs = useAppSelector((state) => state.job.jobs);
   const candidates = useAppSelector((state) => state.candidate.candidates);
   const users = useAppSelector((state) => state.user.users);
-  const userOptions = useMemo(() => users?.filter(it => it.role !== "HR").map((user) => ({ label: user.username, value: user.id })), [users]);
+  const userOptions = useMemo(() => users?.filter(it => it.role !== "Interviewer").map((user) => ({ label: user.username, value: user.id })), [users]);
   const candidateOptions = useMemo(() => candidates?.map((candidate) => ({
     label: `${candidate.full_name} (${candidate.email})`,
     value: candidate.id
@@ -20,6 +20,8 @@ export const ModalAddInterview = (props: any) => {
   const [filteredCandidates, setFilteredCandidates] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
 
   // Cập nhật khi select candidate hoặc khi edit
   useEffect(() => {
@@ -32,21 +34,40 @@ export const ModalAddInterview = (props: any) => {
   // Thêm useEffect để lọc candidates khi job thay đổi
   useEffect(() => {
     if (selectedJob) {
+      const selectedJobData = jobs.find(job => job.id === selectedJob);
+      if (selectedJobData) {
+        const filteredUsersList = users
+          .filter(user =>
+            user.role !== "Interviewer" &&
+            user.department?.toLowerCase() === selectedJobData.department?.toLowerCase()
+          )
+          .map(user => ({
+            label: user.username,
+            value: user.id
+          }));
+        setFilteredUsers(filteredUsersList);
+      }
+      console.log('selectedJobData: ', selectedJobData)
+      console.log('filteredUsersList: ', users)
       const job = jobs.find(job => job.id === selectedJob);
       if (job) {
         const filtered = candidates.filter(candidate =>
           candidate.position?.toLowerCase() === job.position?.toLowerCase()
+          && candidate.status == 'Waiting for interview'
         );
+        console.log('candidates: ', candidates)
 
         setFilteredCandidates(filtered.map(candidate => ({
           label: `${candidate.full_name} (${candidate.email})`,
           value: candidate.id
         })));
+      } else {
+        setFilteredUsers([]);
+        setFilteredCandidates([]);
       }
-    } else {
-      setFilteredCandidates([]);
     }
-  }, [selectedJob, candidates, jobs]);
+  }, [selectedJob, users, jobs]);
+
 
 
 
@@ -128,6 +149,7 @@ export const ModalAddInterview = (props: any) => {
 
   console.log('candidates: ', candidates);
   console.log('jobs: ', jobs);
+  console.log('users: ', users)
   return (
     <Modal
       title={initialValues ? "EDIT INTERVIEW SCHEDULE" : "ADD INTERVIEW SCHEDULE"}
@@ -151,13 +173,13 @@ export const ModalAddInterview = (props: any) => {
         <div className="w-full flex justify-between">
           <Form.Item
             name="title"
-            label="Schedule:"
+            label="Interview title:"
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter schedule title' }]}
           >
             <Input
               allowClear
-              placeholder={"Enter schedule title"}
+              placeholder={"Enter interview title"}
             />
           </Form.Item>
 
@@ -201,13 +223,12 @@ export const ModalAddInterview = (props: any) => {
           <Form.Item
             name="interviewer_ids"
             label="Interviewers:"
-            // className="w-1/2 mr-5"
-            className="w-1/3 mr-5"
+            className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please enter interviews' }]}
           >
             <Select
               data-testid="select-interview-interviewers"
-              options={userOptions} mode="multiple" />
+              options={filteredUsers} mode="multiple" />
           </Form.Item>
           <Form.Item
             name="status"

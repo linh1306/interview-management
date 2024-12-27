@@ -57,7 +57,7 @@ const columns = [
   }
 ];
 export const InterviewPage = () => {
-  const [selectedStatus, setSelectedStatus] = useState<any>("Open");
+  const [selectedStatus, setSelectedStatus] = useState<any>();
   const [selectedInterview, setSelectedInterview] = useState<any>(undefined);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { role } = useAuth();
@@ -73,6 +73,15 @@ export const InterviewPage = () => {
   useEffect(() => {
     dispatch(getInterviews(undefined));
   }, [selectedStatus])
+
+  useEffect(() => {
+    // Call API when status changes with filter
+    if (selectedStatus) {
+      dispatch(getInterviews({ filter: JSON.stringify({ status: selectedStatus }) }));
+    } else {
+      dispatch(getInterviews(undefined));
+    }
+  }, [selectedStatus]);
 
   const handleClose = () => {
     setSelectedInterview(undefined);
@@ -120,13 +129,13 @@ export const InterviewPage = () => {
             defaultValue={selectedStatus}
             allowClear
           />
-          <Input.Search
-            className="w-1/3"
+          {/* <Input.Search
+            className="w-1/6"
             onSearch={(search) => {
               dispatch(getInterviews({ filter: JSON.stringify({ status: selectedStatus }), search }));
             }}
             size="large"
-          />
+          /> */}
         </div>
         <Button
           className="bg-blue-500 text-white p-5 rounded-lg"

@@ -23,14 +23,8 @@ const WorkplaceOptions = [
     'Da Nang'
 ];
 
-const DepartmentOptions = [
-    'IT',
-    'HR',
-    'Finance',
-    'Communication',
-    'Marketing',
-    'Accounting'
-];
+const DepartmentOptions = Object.values(UserDepartment);
+
 
 export const ModalAddRequest = (props: any) => {
     const { initialValues, handleClose, isOpen } = props;

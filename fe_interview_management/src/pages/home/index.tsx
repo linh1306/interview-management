@@ -2,7 +2,7 @@
 import Loading from "@/components/Loading";
 import { useAppSelector } from "@/redux/hooks.ts";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, Rectangle, Tooltip, XAxis, YAxis } from "recharts";
-import { DatePicker } from "antd";
+import { DatePicker, message } from "antd";
 
 import GenericTable from "@/components/Table";
 import { useEffect, useState } from "react";
@@ -16,6 +16,8 @@ import localeData from "dayjs/plugin/localeData";
 import weekday from "dayjs/plugin/weekday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import weekYear from "dayjs/plugin/weekYear";
+import { useAppDispatch } from "@/redux/hooks.ts";
+import { getInterviews } from "@/redux/features/interviewSlice.ts";
 dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
 dayjs.extend(weekday);
@@ -53,7 +55,56 @@ const CANDIDATE_COLUMNS = [
 ];
 
 const Home = () => {
+  const dispatch = useAppDispatch();
+  const interviews = useAppSelector((state) => state.interview.interviews);
   const currentUser = useAppSelector((state: any) => state.auth.currentUser);
+  const [hasChecked, setHasChecked] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(getInterviews(undefined));
+    }
+  }, [currentUser]);
+
+  // Effect 2: Check và hiển thị alert khi có dữ liệu
+  useEffect(() => {
+    console.log('Current state:', {
+      hasChecked,
+      currentUser,
+      interviews,
+      isManager: currentUser?.role === 'Manager',
+      hasResults: !!interviews
+    });
+
+    // Chỉ check và set hasChecked khi đã có interviews
+    if (!hasChecked && currentUser?.role === 'Manager' && interviews?.length > 0) {
+      console.log('Checking for pending interviews');
+
+      const pendingInterviews = interviews.filter(interview => {
+        const hasCurrentUser = interview.interviewers.some(
+          interviewer => interviewer.username === currentUser.username
+        );
+        console.log('Interview:', {
+          status: interview.status,
+          hasCurrentUser,
+          interviewers: interview.interviewers
+        });
+
+        return interview.status === 'Invited' && hasCurrentUser;
+      });
+
+      console.log('Found pending interviews:', pendingInterviews);
+
+      if (pendingInterviews?.length > 0) {
+        message.info('You have a pending interview waiting for your response.');
+      }
+      // Chỉ set hasChecked sau khi đã có data và check xong
+      setHasChecked(true);
+    }
+  }, [interviews, currentUser, hasChecked]);
+
+
+
   if (!currentUser) {
     return <Loading />
   }

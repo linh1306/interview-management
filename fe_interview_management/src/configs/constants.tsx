@@ -139,7 +139,7 @@ export const HighestLevelCandidate = [
 export const CandidateStatus = [
   'Banned',
   'Waiting for interview',
-  'Open',
+  // 'Open',
   'Cancelled interview',
   'Passed interview',
   'Approved offer',
@@ -148,7 +148,9 @@ export const CandidateStatus = [
 export enum InterviewStatus {
   //   Open = 'Open',
   Invited = 'Invited',
-  Interviewed = 'Interviewed',
+  Passed = 'Passed',
+  Failed = 'Failed',
+  // Interviewed = 'Interviewed',
   Cancelled = 'Cancelled',
 }
 

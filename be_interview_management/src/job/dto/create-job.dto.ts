@@ -90,7 +90,6 @@ export class CreateJobDto {
   level: JobLevel[];
 
   @ApiPropertyOptional({
-    example: UserDepartment.Accounting,
     enum: UserDepartment,
   })
   @IsOptional()

@@ -200,32 +200,6 @@ export const ModalAddOffer = (props: any) => {
             />
           </Form.Item>
           <Form.Item
-            name="contract_to"
-            label="Contract To:"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please enter time' }]}
-          >
-            <DatePicker
-              data-testid="select-offer-to"
-              className="w-full"
-              disabledDate={(current) => current && current < moment().startOf('day')}
-            />
-          </Form.Item>
-        </div>
-        <div className="w-full flex justify-between">
-          <Form.Item
-            name="contract_from"
-            label="Contract From:"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please enter time' }]}
-          >
-            <DatePicker
-              data-testid="select-offer-from"
-              className="w-full"
-              disabledDate={(current) => current && current < moment().startOf('day')}
-            />
-          </Form.Item>
-          <Form.Item
             name="basic_salary"
             label="Basic Salary:"
             className="w-1/2"
@@ -258,6 +232,34 @@ export const ModalAddOffer = (props: any) => {
               placeholder={"Enter salary from"}
             />
           </Form.Item>
+
+        </div>
+        <div className="w-full flex justify-between">
+          <Form.Item
+            name="contract_from"
+            label="Contract From:"
+            className="w-1/2 mr-5"
+            rules={[{ required: true, message: 'Please enter time' }]}
+          >
+            <DatePicker
+              data-testid="select-offer-from"
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
+            />
+          </Form.Item>
+          <Form.Item
+            name="contract_to"
+            label="Contract To:"
+            className="w-1/2"
+            rules={[{ required: true, message: 'Please enter time' }]}
+          >
+            <DatePicker
+              data-testid="select-offer-to"
+              className="w-full"
+              disabledDate={(current) => current && current < moment().startOf('day')}
+            />
+          </Form.Item>
+
         </div>
         <div className="w-full flex justify-between">
           <Form.Item

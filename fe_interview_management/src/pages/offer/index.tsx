@@ -21,7 +21,7 @@ const columns = [
     dataIndex: 'candidate',
     key: 'candidate_name',
     render: (_, data: any) => {
-      return data?.candidate.full_name;
+      return data?.candidate?.full_name;
     }
   },
   {
@@ -29,7 +29,7 @@ const columns = [
     dataIndex: 'candidate',
     key: 'email',
     render: (_, data: any) => {
-      return data?.candidate.email;
+      return data?.candidate?.email;
     }
   },
   {

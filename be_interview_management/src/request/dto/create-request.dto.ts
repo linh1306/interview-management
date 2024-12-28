@@ -33,8 +33,8 @@ export class CreateRequestDto {
   @Trim()
   department: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiProperty({ nullable: true })
+  @IsOptional()
   @IsString()
   @Trim()
   description: string;

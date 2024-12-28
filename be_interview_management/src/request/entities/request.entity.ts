@@ -20,7 +20,7 @@ export class Request extends AbstractEntity {
   @Column()
   department: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column()

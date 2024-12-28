@@ -25,7 +25,7 @@ const columns = [
     dataIndex: 'candidate',
     key: 'candidate',
     render: (_, data) => {
-      return data?.candidate.full_name;
+      return data?.candidate?.full_name;
     }
   },
   {

@@ -173,6 +173,7 @@ export const ModalAddRequest = (props: any) => {
                         ]}
                     >
                         <Select
+                            data-testid="select-request-position"
                             options={positionOptionsByDept}
 
                             disabled={!department}
@@ -219,6 +220,7 @@ export const ModalAddRequest = (props: any) => {
                         rules={[{ required: true, message: 'Please select workplace' }]}
                     >
                         <Select
+                            data-testid="select-request-workplace"
                             options={workplaceOptions}
                             placeholder="Select workplace"
                         />

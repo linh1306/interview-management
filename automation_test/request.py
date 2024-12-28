@@ -2,6 +2,8 @@ from playwright.sync_api import sync_playwright, expect
 import time
 import psycopg2
 from psycopg2 import Error
+from datetime import datetime, timedelta
+
 
 
 class TestRequest:
@@ -71,7 +73,7 @@ class TestRequest:
     def login(self, username='admin', password='123123'):
         """Login to application"""
         # time.sleep(3)
-        self.page.goto("http://103.56.158.135:5173/login")
+        self.page.goto("http://localhost:5173/login")
 
         # Fill login form
         self.page.fill("input[placeholder='Username']", username)
@@ -86,14 +88,19 @@ class TestRequest:
 
     def test_od_create_request(self):
         """Test creating recruitment requests"""
-        self.login('it', '123456')
+        self.login('itmanager', '123456')
+        current_date = datetime.now()
+        # Lấy ngày 1 tháng sau
+        next_month = current_date + timedelta(days=30)
+        current_date_str = current_date.strftime('%d/%m/%Y')
+        next_month_str = next_month.strftime('%d/%m/%Y')
 
         test_requests = [
             {
                 "position": "Frontend Developer",
                 "quantity": "2",
-                "start_date": "25/12/2024",
-                "end_date": "25/01/2025",
+                "start_date": current_date_str,
+                "end_date": next_month_str,
                 "workplace": "Ha Noi",
                 "level": ["Junior", "Middle"],
                 "description": "Looking for Frontend Developers with React experience"
@@ -101,8 +108,8 @@ class TestRequest:
             {
                 "position": "Backend Developer",
                 "quantity": "1",
-                "start_date": "01/01/2025",
-                "end_date": "31/01/2025",
+                "start_date": current_date_str,
+                "end_date": next_month_str,
                 "workplace": "Ho Chi Minh",
                 "level": ["Senior"],
                 "description": "Looking for a Senior Backend Developer with Node.js and database expertise"
@@ -116,7 +123,8 @@ class TestRequest:
                 self.page.click("text='New Recruitment Request'")
 
                 # Fill Position
-                self.page.fill("input[placeholder='Enter position title']", request_data["position"])
+                self.page.click("[data-testid='select-request-position']")
+                self.page.click(f"div[title='{request_data['position']}']")
 
                 # Fill Quantity
                 self.page.fill("input[placeholder='Enter number of positions']", request_data["quantity"])
@@ -130,7 +138,7 @@ class TestRequest:
                 self.page.click("text='NEW RECRUITMENT REQUEST'", timeout=2000)
 
                 # Select Workplace
-                self.page.click(".ant-select-outlined.ant-select-in-form-item", timeout=2000)
+                self.page.click("[data-testid='select-request-workplace']")
                 self.page.click(f"div.ant-select-item-option[title='{request_data['workplace']}']")
 
                 # Select Levels
@@ -174,7 +182,7 @@ class TestRequest:
     def test_hr_opera_request(self):
         """Test HR operations on requests (approve/reject)"""
         self.logout()
-        self.login('lan.nguyen', '123456')
+        self.login('hr', '123456')
 
         try:
 

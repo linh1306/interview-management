@@ -33,7 +33,7 @@ const columns = [
     dataIndex: 'job',
     key: 'job',
     render: (_, data) => {
-      return data?.job.title;
+      return data?.job?.title;
     }
   },
   {

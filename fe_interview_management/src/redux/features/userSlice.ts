@@ -40,6 +40,18 @@ export const updateUser = createAsyncThunk(
     }
   }
 );
+export const deleteUser = createAsyncThunk(
+  "users/deleteUser",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await userApi.deleteUser(id);
+      return { id, ...response.data };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 
 export interface UserState {
   users: IUser[];
@@ -71,6 +83,13 @@ const userSlice = createSlice({
           });
 
         }
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.users = state.users.filter(user => user.id !== action.payload.id);
+        toast("User deleted successfully", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
       })
       .addMatcher(
         (action) =>

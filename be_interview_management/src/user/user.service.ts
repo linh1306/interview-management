@@ -76,4 +76,36 @@ export class UserService extends BaseService<User> {
 
     return user;
   }
+  async delete(id: number, user: User) {
+    // Không cho phép xóa admin (id: 1) và tự xóa chính mình
+    if (id === 1 || id === user.id) {
+      throw new exc.BadRequest({
+        message: 'Cannot delete this user',
+        errorCode: '400',
+      });
+    }
+
+    const userToDelete = await this.repository.findOne({
+      where: { id }
+    });
+
+    if (!userToDelete) {
+      throw new exc.NotFound({
+        message: 'User not found',
+        errorCode: '404',
+      });
+    }
+
+    // Soft delete
+    userToDelete.deleted = new Date();
+    userToDelete.last_modified_by = user;
+
+    await this.repository.save(userToDelete);
+
+    return {
+      success: true,
+      message: 'User deleted successfully'
+    };
+  }
+
 }

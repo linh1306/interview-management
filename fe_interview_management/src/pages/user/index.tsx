@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getUsers } from "@/redux/features/userSlice.ts";
 import { ModalAddUser } from "@/components/modal/ModalAddUser.tsx";
 import moment from 'moment'
+import { deleteUser } from "@/redux/features/userSlice.ts";
 
 const roleOptions = ROLE.map((role) => {
   return { label: role, value: role };
@@ -60,6 +61,23 @@ export const ManageUser = () => {
     setUser(undefined);
     setIsModalVisible(false);
   }
+  const handleDelete = async (record) => {
+    try {
+      await dispatch(deleteUser(record.id));
+      await dispatch(getUsers({}));
+      // notification.success({
+      //   message: 'Success',
+      //   description: 'User deleted successfully',
+      // });
+    } catch (error) {
+      // notification.error({
+      //   message: 'Error',
+      //   description: error.response?.data?.message || 'Failed to delete user',
+      // });
+      console.log('error: ', error)
+    }
+  };
+
 
   return (
     <div className="p-10 bg-white h-full">
@@ -109,6 +127,7 @@ export const ManageUser = () => {
             });
             setIsModalVisible(true);
           }}
+          onDeleteItem={handleDelete}
           pagination={{ pageSize: 5, pageSizeOptions: ['5', '10', '15', '20'] }}
         />
       </div>

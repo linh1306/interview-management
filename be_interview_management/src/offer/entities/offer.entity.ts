@@ -47,8 +47,8 @@ export class Offer extends AbstractEntity {
   @Column({ type: 'enum', enum: OfferLevel })
   level: OfferLevel;
 
-  @Column({ type: 'enum', enum: OfferStatus })
-  status: OfferStatus;
+  @Column()
+  status: string;
 
   @ManyToOne(() => User, (manager) => manager.offers)
   @JoinColumn({ name: 'manager_id' })

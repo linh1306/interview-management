@@ -30,6 +30,7 @@ export class OfferService extends BaseService<Offer> {
       // due_date,
       contract_from,
       contract_to,
+        status,
       ...rest
     } = payload;
 
@@ -41,13 +42,14 @@ export class OfferService extends BaseService<Offer> {
       // due_date: new Date(due_date),
       contract_from: new Date(contract_from),
       contract_to: new Date(contract_to),
+      status: payload.status,
       candidate: { id: candidate_id } as Candidate,
       interview_schedule: {
         id: interview_schedule_id,
       } as InterviewSchedule,
       // recruiter: { id: payload.recruiter_id } as User,
       manager: { id: manager_id } as User,
-      status: OfferStatus.Approved,
+
     });
   }
 

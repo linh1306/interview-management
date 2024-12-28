@@ -73,6 +73,12 @@ export class CreateOfferDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
+  @Trim()
+  status: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @IsPositive()
   @ToNumber()
   basic_salary: number;

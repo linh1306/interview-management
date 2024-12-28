@@ -45,9 +45,6 @@ export const ModalAddOffer = (props: any) => {
       setPositionOptionsByDept([]);
       setFilteredCandidates([]);
     }
-    console.log(positionOptionsByDept)
-    console.log(candidateOptions)
-    console.log('candidates: ', candidates)
   }, [department, candidates]);
   const { user } = useAuth();
   const departmentOptions = useMemo(() => {
@@ -102,11 +99,12 @@ export const ModalAddOffer = (props: any) => {
             interview_schedule_id: 1,
             position: data.position || "Backend Developer",
             level: data.level || "Junior 2.1",
+            status: data.status
           };
+          console.log('data: ', data)
           if (initialValues) {
             await dispatch(updateOffer({ payload, id: initialValues.id }));
           } else {
-            delete payload.status;
             await dispatch(createOffer(payload));
           }
           await dispatch(getOffers({}));

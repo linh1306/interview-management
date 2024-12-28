@@ -78,6 +78,53 @@ class TestPurchase():
         if hasattr(cls, 'driver'):  # Kiểm tra xem driver có tồn tại không
             cls.driver.quit()
 
+    def verify_user_in_db(self, user_data):
+        """Verify user data in database"""
+        try:
+            # Query để kiểm tra user tồn tại với thông tin phù hợp
+            verify_query = """
+                SELECT 
+                    full_name,
+                    email,
+                    username,
+                    role,
+                    department,
+                    status,
+                    note
+                FROM public."user" 
+                WHERE username = %s
+            """
+
+            self.cursor.execute(verify_query, (
+                user_data["username"],
+            ))
+
+            result = self.cursor.fetchone()
+            assert result is not None, f"User {user_data['username']} not found in database"
+
+            # Verify từng trường dữ liệu
+            db_full_name, db_email, db_username, db_role, db_department, db_status, db_note = result
+
+            assert db_full_name == user_data[
+                "full_name"], f"Full name mismatch: {db_full_name} != {user_data['full_name']}"
+            assert db_email == user_data["email"], f"Email mismatch: {db_email} != {user_data['email']}"
+            assert db_username == user_data["username"], f"Username mismatch: {db_username} != {user_data['username']}"
+            assert db_role == user_data["role"], f"Role mismatch: {db_role} != {user_data['role']}"
+            assert db_department == user_data[
+                "department"], f"Department mismatch: {db_department} != {user_data['department']}"
+            assert db_status == user_data["status"], f"Status mismatch: {db_status} != {user_data['status']}"
+            assert db_note == user_data["note"], f"Note mismatch: {db_note} != {user_data['note']}"
+
+            print(f"✓ Verified user in database: {user_data['username']}")
+            return True
+
+        except AssertionError as ae:
+            print(f"❌ Verification failed: {str(ae)}")
+            raise
+        except Exception as e:
+            print(f"❌ Database verification error: {str(e)}")
+            raise
+
     def test_login(self, user_name='admin', password='123123'):
         """
         Test login functionality with valid credentials
@@ -150,11 +197,11 @@ class TestPurchase():
             email.send_keys(user_data["email"])
 
             # Fill Phone
-            phone = self.driver.find_element(By.CSS_SELECTOR, "input[placeholder='Enter phone']")
-            phone.clear()
-            phone.send_keys(user_data["phone"])
-
-            time.sleep(1)
+            # phone = self.driver.find_element(By.CSS_SELECTOR, "input[placeholder='Enter phone']")
+            # phone.clear()
+            # phone.send_keys(user_data["phone"])
+            #
+            # time.sleep(1)
 
             # Click dropdown
             role_dropdown = WebDriverWait(self.driver, 10).until(
@@ -172,27 +219,6 @@ class TestPurchase():
                                                           f"[data-testid='role-option-{user_data['role']}']")
             role_option.click()
 
-            # manage role
-
-            # Fill Date of Birth
-            self.driver.find_element(By.CSS_SELECTOR, ".ant-picker-input").click()
-            self.driver.find_element(By.ID, "layout-multiple-horizontal_dob").send_keys("2002-02-02")
-
-            # Fill Address
-            address = self.driver.find_element(By.CSS_SELECTOR, "input[placeholder='Enter address']")
-            address.clear()
-            address.send_keys(user_data["address"])
-
-            # Select Gender
-            # gender = self.driver.find_element(By.CSS_SELECTOR, "input[id^='rc_select_'][id$='gender']")
-            # gender.click()
-            self.driver.find_element(By.ID, "layout-multiple-horizontal_gender").click()
-            gender_option = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, "//div[@class='ant-select-item-option-content'][text()='Female']"))
-                # Hoặc Male: "//div[@class='ant-select-item-option-content'][text()='Male']"
-            )
-            gender_option.click()
 
             # Select Department
             self.driver.find_element(By.ID, "layout-multiple-horizontal_department").click()
@@ -251,10 +277,10 @@ class TestPurchase():
                 "dob": "15/07/1985",
                 "address": "456 Lý Thường Kiệt, TP. Hồ Chí Minh",
                 "gender": "Male",
-                "department": "Finance",
+                "department": "IT",
                 "status": "Active",
                 "username": "nam.tran",
-                "note": "Quản lý phòng kinh doanh, phụ trách chiến lược và giám sát hoạt động đội nhóm."
+                "note": "Quản lý phòng phát trển phần mềm."
             },
             {
                 "full_name": "Phạm Hoàng Anh",
@@ -275,6 +301,9 @@ class TestPurchase():
         for user_data in test_users:
             print(f"\nTesting user creation for {user_data['role']}")
             fill_user_form(user_data)
+            time.sleep(1)
+            self.verify_user_in_db(user_data)
+
             print(f"✓ Successfully created user: {user_data['full_name']}")
 
         print("\nAll user creation tests completed successfully ✅")

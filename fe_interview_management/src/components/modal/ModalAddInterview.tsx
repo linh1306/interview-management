@@ -69,11 +69,17 @@ export const ModalAddInterview = (props: any) => {
   }, [selectedJob, users, jobs]);
 
 
+  const jobOptions = useMemo(() => {
+    console.log('All jobs:', jobs);
+    const filteredJobs = jobs.filter(job => job.status === 'Open');
+    console.log('Open jobs:', filteredJobs);
 
+    return filteredJobs.map((job) => ({
+      label: job.title,
+      value: job.id
+    }));
+  }, [jobs]);
 
-
-
-  const jobOptions = useMemo(() => jobs.map((job) => ({ label: job.title, value: job.id })), [jobs]);
   const positionOptions = OfferPosition.map((position) => ({ label: position, value: position }));
   const statusOptions = [
     { value: 'Invited', label: 'Invited' },

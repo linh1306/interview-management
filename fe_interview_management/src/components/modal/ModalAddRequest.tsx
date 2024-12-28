@@ -41,14 +41,20 @@ export const ModalAddRequest = (props: any) => {
     const handleDepartmentChange = (val) => {
         setDepartment(val);
         form.setFieldValue('position', undefined);
-        setPositionOptionsByDept(OfferPositionByDepartment[val] || []);
+        const positions = OfferPositionByDepartment[val] || [];
+        setPositionOptionsByDept(positions);
+        console.log('positions after change:', positions);
     };
 
     useEffect(() => {
         if (department) {
-            setPositionOptionsByDept(OfferPositionByDepartment[department] || []);
+            const positions = OfferPositionByDepartment[department] || [];
+            // setPositionOptionsByDept(OfferPositionByDepartment[department] || []);
+            setPositionOptionsByDept(positions);
+            form.validateFields(['position']);
         } else {
             setPositionOptionsByDept([]);
+            form.setFieldValue('position', undefined);
         }
     }, [department]);
 
@@ -153,11 +159,12 @@ export const ModalAddRequest = (props: any) => {
                         name="position"
                         label="Position:"
                         className="w-1/2 mr-5"
+                        validateTrigger="onBlur"
                         rules={[
                             { required: true, message: 'Please select a position' },
                             ...(user?.role === UserRole.Admin || user?.role === UserRole.HR ? [{
                                 validator(_, value) {
-                                    if (!getFieldValue('department')) {
+                                    if (!department) {
                                         return Promise.reject(new Error('Please choose the department first'));
                                     }
                                     return Promise.resolve();
@@ -166,10 +173,7 @@ export const ModalAddRequest = (props: any) => {
                         ]}
                     >
                         <Select
-                            options={positionOptionsByDept.map((position) => ({
-                                label: position.label,
-                                value: position.value,
-                            }))}
+                            options={positionOptionsByDept}
 
                             disabled={!department}
                             placeholder={department ? "Select position" : "Please select department first"}

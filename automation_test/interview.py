@@ -63,15 +63,15 @@ class TestInterview:
 
     def login(self, username='admin', password='123123'):
         """Login to application"""
-        self.page.goto("http://103.56.158.135:5173/login")
+        self.page.goto("http://localhost:5173/login")
         self.page.fill("input[placeholder='Username']", username)
         self.page.fill("input[placeholder='Password']", password)
         self.page.click("button[type='submit']")
 
     def test_hr_create_interview(self):
         """Test creating interviews"""
-        self.login('lan.nguyen', '123456')
-
+        # self.login('lan.nguyen', '123456')
+        self.login()
         # Calculate dates and times
         today = datetime.now()
         interview_date = (today + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -80,12 +80,10 @@ class TestInterview:
 
         interview_data = [
             {
-                "title": "Technical Interview - John Doe",
-                "job_id": "Frontend Developer",  # Will need to select from dropdown
-                "candidate_id": "John Doe (john.doe@test.com)",  # Will need to select from dropdown
-                "position": "Backend Developer",
-                "interviewer_ids": ["it"],  # Will need to select from dropdown
-                "status": "Open",
+                "title": "Automation Test Interview 1",
+                "job_id": "Fresher Frontend Developer",  # Will need to select from dropdown
+                "candidate_id": "Hoàng Ngọc Lan (hoangngoclan52@gmail.com)",  # Will need to select from dropdown
+                "interviewer_ids": ["itmanager"],  # Will need to select from dropdown
                 "schedule_date": interview_date,
                 "schedule_time_from": time_from,
                 "schedule_time_to": time_to,
@@ -93,12 +91,11 @@ class TestInterview:
                 "note": "Technical assessment and culture fit evaluation"
             },
             {
-                "title": "Marketing Interview - Jane Smith",
-                "job_id": "Digital Marketing Specialist",  # Will need to select from dropdown
-                "candidate_id": "Jane Smith (jane.smith@test.com)",  # Will need to select from dropdown
-                "position": "Bussiness Analyst",
-                "interviewer_ids": ["marketing"],  # Will need to select from dropdown
-                "status": "Open",
+                "title": "Automation Test Interview 2",
+                "job_id": "Legal Manager",  # Will need to select from dropdown
+                "candidate_id": "Phạm Thị Nhung (phamthinhung10@outlook.com)",  # Will need to select from dropdown
+                "interviewer_ids": ["afmanager"],  # Will need to select from dropdown
+                # "status": "Open",
                 "schedule_date": interview_date,
                 "schedule_time_from": time_from,
                 "schedule_time_to": time_to,
@@ -113,19 +110,19 @@ class TestInterview:
                 self.page.click("text='Add Interview'")
 
                 # Fill Schedule Title
-                self.page.fill("input[placeholder='Enter schedule title']", interview_data["title"])
+                self.page.fill("input[placeholder='Enter interview title']", interview_data["title"])
 
                 # Select Job
                 self.page.click("[data-testid='select-interview-job']")
-                self.page.click(f"div[title='{interview_data['job_id']}']")
+                self.page.click(f"div[title='{interview_data['job_id']}']", timeout=2000)
 
                 # Select Candidate
                 self.page.click("[data-testid='select-interview-candidate']")
                 self.page.click(f"div[title^='{interview_data['candidate_id']}']")
 
-                # Select Position
-                self.page.click("[data-testid='select-interview-position']")
-                self.page.click(f"div[title='{interview_data['position']}']")
+                # # Select Position
+                # self.page.click("[data-testid='select-interview-position']")
+                # self.page.click(f"div[title='{interview_data['position']}']")
 
                 # Select Interviewers
                 self.page.click("[data-testid='select-interview-interviewers']")
@@ -133,9 +130,9 @@ class TestInterview:
                     self.page.click(f"div[title='{interviewer}']")
                 self.page.keyboard.press("Escape")
 
-                # Select Status
-                self.page.click("[data-testid='select-interview-status']")
-                self.page.click(f"div[title='{interview_data['status']}']")
+                # # Select Status
+                # self.page.click("[data-testid='select-interview-status']")
+                # self.page.click(f"div[title='{interview_data['status']}']")
 
                 # Set Schedule Date
                 self.page.click("[data-testid='date-interview-schedule']")

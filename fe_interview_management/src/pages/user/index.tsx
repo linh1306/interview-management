@@ -61,25 +61,42 @@ export const ManageUser = () => {
     setUser(undefined);
     setIsModalVisible(false);
   }
+  const handleEdit = (record) => {
+    // Log để debug
+
+    const editUser = {
+      id: record.id,
+      username: record.username,
+      email: record.email,
+      phone: record.phone,
+      department: record.department,
+      role: record.role,
+      status: record.status,
+      gender: record.gender,
+      dob: record.dob ? moment(record.dob) : null,
+      note: record.note || '',
+      address: record.address || '',
+      full_name: record.full_name,
+      password: record.password // nếu cần
+    };
+
+
+    setUser(editUser);
+    setIsModalVisible(true);
+  };
+
   const handleDelete = async (record) => {
     try {
       await dispatch(deleteUser(record.id));
       await dispatch(getUsers({}));
-      // notification.success({
-      //   message: 'Success',
-      //   description: 'User deleted successfully',
-      // });
     } catch (error) {
-      // notification.error({
-      //   message: 'Error',
-      //   description: error.response?.data?.message || 'Failed to delete user',
-      // });
       console.log('error: ', error)
     }
   };
 
 
   return (
+    console.log('users: ', users),
     <div className="p-10 bg-white h-full">
       <Helmet title="Manage User" />
       <ModalAddUser
@@ -120,13 +137,7 @@ export const ManageUser = () => {
           columns={columns}
           data={users}
           enableAction={true}
-          onEditItem={(record) => {
-            setUser({
-              ...record,
-              dob: record.dob ? moment(record.dob) : undefined,
-            });
-            setIsModalVisible(true);
-          }}
+          onEditItem={handleEdit}
           onDeleteItem={handleDelete}
           pagination={{ pageSize: 5, pageSizeOptions: ['5', '10', '15', '20'] }}
         />

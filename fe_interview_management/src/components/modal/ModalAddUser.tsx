@@ -5,6 +5,7 @@ import { createUser, getUsers, updateUser } from "@/redux/features/userSlice.ts"
 import { Gender, UserDepartment, UserRole, UserStatus } from "@/configs/constants.tsx";
 import TextArea from "antd/es/input/TextArea";
 import moment from "moment/moment";
+import { useState, useEffect } from "react";
 const genderOptions = Object.entries(Gender).map(([key, value]) => ({ label: value, value: value }));
 const departmentOptions = Object.entries(UserDepartment).map(([key, value]) => ({
   label: value,
@@ -28,9 +29,16 @@ export const ModalAddUser = (props: any) => {
   const { initialValues, handleClose, isOpen } = props;
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
-  const defaultValues = {
-    status: UserStatus.Active // Set default status to active
-  };
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue(initialValues);
+    } else {
+      form.setFieldsValue({
+        status: UserStatus.Active
+      });
+    }
+  }, [initialValues, form]);
+
 
   return (
     <Modal
@@ -83,7 +91,7 @@ export const ModalAddUser = (props: any) => {
             handleClose();
           }
         }}
-        initialValues={defaultValues}
+        // initialValues={defaultValues}
         labelCol={{ span: 6 }}
         key={initialValues}
       >
@@ -100,18 +108,6 @@ export const ModalAddUser = (props: any) => {
             />
 
           </Form.Item>
-          {/* <Form.Item
-            name="email"
-            label="Email:"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please enter email' }]}
-          >
-            <Input
-              allowClear
-              placeholder={"Enter email"}
-            />
-          </Form.Item> */}
-
 
         </div>
         <div className="w-full flex justify-between">
@@ -139,14 +135,6 @@ export const ModalAddUser = (props: any) => {
           </Form.Item>
         </div>
         <div className="w-full flex justify-between">
-          {/* <Form.Item
-            name="gender"
-            label="Gender"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please select gender' }]}
-          >
-            <Select options={genderOptions} />
-          </Form.Item> */}
           <Form.Item
             name="department"
             label="Department"
@@ -162,17 +150,6 @@ export const ModalAddUser = (props: any) => {
         </div>
 
         <div className="w-full flex justify-between">
-          {/* <Form.Item
-            name="phone"
-            label="Phone:"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please enter phone' }]}
-          >
-            <Input
-              allowClear
-              placeholder={"Enter phone"}
-            />
-          </Form.Item> */}
           <Form.Item
             name="role"
             label="Role:"
@@ -187,50 +164,6 @@ export const ModalAddUser = (props: any) => {
           </Form.Item>
         </div>
 
-        {/* <div className="w-full flex justify-between">
-          <Form.Item
-            name="dob"
-            label="Date of Birth:"
-            className="w-1/2 mr-5"
-          >
-            <DatePicker
-              className="w-full"
-              disabledDate={(current) => current && current > moment().startOf('day')}
-            />
-          </Form.Item>
-          <Form.Item
-            name="address"
-            label="Address:"
-            className="w-1/2"
-          >
-            <Input
-              allowClear
-              placeholder={"Enter address"}
-            />
-          </Form.Item>
-        </div> */}
-        {/* <div className="w-full flex justify-between">
-          <Form.Item
-            name="gender"
-            label="Gender"
-            className="w-1/2 mr-5"
-            rules={[{ required: true, message: 'Please select gender' }]}
-          >
-            <Select options={genderOptions} />
-          </Form.Item>
-          <Form.Item
-            name="department"
-            label="Department"
-            className="w-1/2"
-            rules={[{ required: true, message: 'Please select department' }]}
-          >
-            <Select
-              options={departmentOptions}
-              data-testid="department-select"  // Add this
-              className="department-select"
-            />
-          </Form.Item>
-        </div> */}
         <div className="w-full flex justify-between">
           <Form.Item
             name="status"
@@ -244,13 +177,6 @@ export const ModalAddUser = (props: any) => {
               className="status-select"      // Add specific class
             />
           </Form.Item>
-          {/* <Form.Item
-            name="username"
-            label="Username"
-            className="w-1/2"
-          >
-            <Input />
-          </Form.Item> */}
         </div>
         <Form.Item
           name="note"

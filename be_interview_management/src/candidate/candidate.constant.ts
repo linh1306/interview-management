@@ -13,4 +13,5 @@ export enum CandidateStatus {
   Cancelled = 'Cancelled interview',
   Passed = 'Passed interview',
   Approved = 'Approved offer',
+  Rejected = 'Rejected offer',
 }

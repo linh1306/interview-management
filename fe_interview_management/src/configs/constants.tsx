@@ -158,7 +158,7 @@ export enum OfferStatus {
   Waiting = 'Waiting for approval',
   Approved = 'Approved offer',
   Reject = 'Rejected offer',
-  Cancelled = 'Cancelled offer',
+  // Cancelled = 'Cancelled offer',
 }
 
 export enum OfferLevel {

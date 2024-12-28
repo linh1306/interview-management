@@ -142,7 +142,7 @@ export const OfferPage = () => {
               contract_to: dayjs(record.contract_to),
               candidate_id: { label: record.candidate.full_name, value: record.candidate.id },
               manager_id: { label: record.manager.full_name, value: record.manager.id },
-              interview_schedule_id: { label: record.interview_schedule.title, value: record.interview_schedule.id }
+              // interview_schedule_id: { label: record.interview_schedule.title, value: record.interview_schedule.id }
             });
             setIsModalVisible(true);
           }}

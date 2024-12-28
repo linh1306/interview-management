@@ -8,6 +8,7 @@ import { useAuth } from "@/redux/hooks.ts";
 import moment from "moment";
 import { OfferPositionByDepartment } from '@/configs/constants.tsx'
 import { useForm } from "antd/es/form/Form";
+import { createCandidate, getCandidates, updateCandidate } from "@/redux/features/candidateSlice.ts";
 
 
 
@@ -75,6 +76,35 @@ export const ModalAddOffer = (props: any) => {
       ...hrUsers.map((hrUser) => ({ label: hrUser.username, value: hrUser.id })),
     ];
   }, [users, user]);
+  useEffect(() => {
+    if (initialValues) {
+      setDepartment(initialValues.department);
+
+      // Format data cho form
+      const formattedValues = {
+        ...initialValues,
+        contract_from: moment(initialValues.contract_from),
+        contract_to: moment(initialValues.contract_to),
+        candidate: {
+          label: initialValues.candidate?.full_name,
+          value: initialValues.candidate?.id
+        },
+        manager_id: {
+          label: initialValues.manager?.username,
+          value: initialValues.manager?.id
+        },
+        department: initialValues.department,
+        contract_type: initialValues.contract_type,
+        status: initialValues.status,
+        basic_salary: initialValues.basic_salary,
+        currency: initialValues.currency,
+        note: initialValues.note
+      };
+
+      form.setFieldsValue(formattedValues);
+    }
+  }, [initialValues, form]);
+
 
   return (
     <Modal
@@ -101,14 +131,43 @@ export const ModalAddOffer = (props: any) => {
             level: data.level || "Junior 2.1",
             status: data.status
           };
-          console.log('data: ', data)
-          if (initialValues) {
-            await dispatch(updateOffer({ payload, id: initialValues.id }));
-          } else {
-            await dispatch(createOffer(payload));
+          try {
+            // Update candidate status based on offer status
+            console.log('data: ', data)
+            if (data.candidate) {
+              const candidateId = data.candidate.id
+              let newCandidateStatus;
+
+              switch (data.status) {
+                case 'Approved offer':
+                  newCandidateStatus = 'Approved offer';
+                  break;
+                case 'Rejected offer':
+                  newCandidateStatus = 'Rejected offer';
+                  break;
+                // Thêm các case khác nếu cần
+              }
+
+              if (newCandidateStatus) {
+                await dispatch(updateCandidate({
+                  id: candidateId,
+                  payload: { status: newCandidateStatus }
+                }));
+              }
+            }
+
+            // Update/Create offer
+            if (initialValues) {
+              await dispatch(updateOffer({ payload, id: initialValues.id }));
+            } else {
+              await dispatch(createOffer(payload));
+            }
+
+            await dispatch(getOffers({}));
+            handleClose();
+          } catch (error) {
+            console.error('Error:', error);
           }
-          await dispatch(getOffers({}));
-          handleClose();
         }}
         initialValues={initialValues || { currency: "USD" }}
         labelCol={{ span: 6 }}

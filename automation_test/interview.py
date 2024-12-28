@@ -68,6 +68,51 @@ class TestInterview:
         self.page.fill("input[placeholder='Password']", password)
         self.page.click("button[type='submit']")
 
+    def verify_interview_in_db(self, interview_data):
+        """Verify interview data in database"""
+        try:
+            # Query to check if interview exists with matching details
+            verify_query = """
+                SELECT 
+                    title,
+                    schedule_date,
+                    schedule_time_from,
+                    schedule_time_to,
+                    location,
+                    note
+                FROM public.interview_schedule 
+                WHERE title = %s
+                AND location = %s
+                AND note = %s
+            """
+
+            self.cursor.execute(verify_query, (
+                interview_data["title"],
+                interview_data["location"],
+                interview_data["note"]
+            ))
+
+            result = self.cursor.fetchone()
+            assert result is not None, f"Interview {interview_data['title']} not found in database"
+
+            # Verify each field matches
+            db_title, db_date, db_time_from, db_time_to, db_location, db_note = result
+
+            assert db_title == interview_data["title"], f"Title mismatch: {db_title} != {interview_data['title']}"
+            assert db_location == interview_data[
+                "location"], f"Location mismatch: {db_location} != {interview_data['location']}"
+            assert db_note == interview_data["note"], f"Note mismatch: {db_note} != {interview_data['note']}"
+
+            print(f"✓ Verified interview in database: {interview_data['title']}")
+            return True
+
+        except AssertionError as ae:
+            print(f"❌ Verification failed: {str(ae)}")
+            raise
+        except Exception as e:
+            print(f"❌ Database verification error: {str(e)}")
+            raise
+
     def test_hr_create_interview(self):
         """Test creating interviews"""
         # self.login('lan.nguyen', '123456')
@@ -171,6 +216,7 @@ class TestInterview:
             # Create each interview
             for interview in interview_data:
                 fill_interview_form(interview)
+                self.verify_interview_in_db(interview)
 
             print("\n🎉 All interviews created successfully 🎉")
 

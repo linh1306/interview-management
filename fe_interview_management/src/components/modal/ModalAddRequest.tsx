@@ -53,6 +53,15 @@ export const ModalAddRequest = (props: any) => {
     }, [department]);
 
     useEffect(() => {
+        // Nếu là Manager, set department ngay từ đầu là department của user
+        if (user?.role === UserRole.Manager) {
+            setDepartment(user.department);
+            setPositionOptionsByDept(OfferPositionByDepartment[user.department] || []);
+        }
+    }, [user]);
+
+
+    useEffect(() => {
         // Set initial department if editing
         if (initialValues?.department) {
             setDepartment(initialValues.department);
@@ -146,14 +155,14 @@ export const ModalAddRequest = (props: any) => {
                         className="w-1/2 mr-5"
                         rules={[
                             { required: true, message: 'Please select a position' },
-                            ({ getFieldValue }) => ({
+                            ...(user?.role === UserRole.Admin || user?.role === UserRole.HR ? [{
                                 validator(_, value) {
                                     if (!getFieldValue('department')) {
                                         return Promise.reject(new Error('Please choose the department first'));
                                     }
                                     return Promise.resolve();
                                 },
-                            }),
+                            }] : []),
                         ]}
                     >
                         <Select

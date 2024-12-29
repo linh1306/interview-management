@@ -65,14 +65,112 @@ class TestJob:
 
     def login(self, username='admin', password='123123'):
         """Login to application"""
-        self.page.goto("http://103.56.158.135:5173/login")
+        self.page.goto("http://localhost:5173/login")
+        # self.page.goto("http://103.56.158.135:5173/login")
         self.page.fill("input[placeholder='Username']", username)
         self.page.fill("input[placeholder='Password']", password)
         self.page.click("button[type='submit']")
 
+    def verify_job_in_db(self, job_data):
+        """Verify job data in database"""
+        try:
+            # Add delay to ensure data is saved
+            time.sleep(2)
+
+            # Query để kiểm tra job trong database
+            verify_query = """
+                SELECT 
+                    j.title,
+                    j.department,
+                    j.position,
+                    j.skills,
+                    j.start_date,
+                    j.end_date,
+                    j.salary_from,
+                    j.salary_to,
+                    j.level,
+                    j.status,
+                    j.description
+                FROM public.job j
+                WHERE j.title = %s
+                AND j.department = %s
+                ORDER BY j.created_date DESC
+                LIMIT 1
+            """
+
+            self.cursor.execute(verify_query, (
+                job_data["title"],
+                job_data["department"]
+            ))
+
+            result = self.cursor.fetchone()
+            assert result is not None, f"Job {job_data['title']} not found in database"
+
+            # Unpack database results
+            (db_title, db_department, db_position, db_skills,
+             db_start_date, db_end_date, db_salary_from, db_salary_to,
+             db_level_str, db_status, db_description) = result
+            db_level_list = db_level_str.strip('{}').split(',')  # Convert '{Senior,Leader}' to ['Senior', 'Leader']
+            db_level = set(db_level_list)
+
+
+            # Verify essential fields
+            assert db_title == job_data["title"], \
+                f"Title mismatch: {db_title} != {job_data['title']}"
+
+            assert db_department == job_data["department"], \
+                f"Department mismatch: {db_department} != {job_data['department']}"
+
+            assert db_position == job_data["position"], \
+                f"Position mismatch: {db_position} != {job_data['position']}"
+
+            # Verify arrays (skills và level được lưu dưới dạng array trong PostgreSQL)
+            db_skills_set = set(db_skills) if db_skills else set()
+            expected_skills_set = set(job_data["skills"])
+            assert db_skills_set == expected_skills_set, \
+                f"Skills mismatch: {db_skills_set} != {expected_skills_set}"
+
+            db_level_set = set(db_level) if db_level else set()
+            expected_level_set = set(job_data["level"])
+            assert db_level_set == expected_level_set, \
+                f"Level mismatch: {db_level_set} != {expected_level_set}"
+
+            # Verify dates
+            db_start = db_start_date.strftime("%Y-%m-%d")
+            assert db_start == job_data["start_date"], \
+                f"Start date mismatch: {db_start} != {job_data['start_date']}"
+
+            db_end = db_end_date.strftime("%Y-%m-%d")
+            assert db_end == job_data["end_date"], \
+                f"End date mismatch: {db_end} != {job_data['end_date']}"
+
+            # Verify numeric fields
+            assert float(db_salary_from) == float(job_data["salary_from"]), \
+                f"Salary from mismatch: {db_salary_from} != {job_data['salary_from']}"
+
+            assert float(db_salary_to) == float(job_data["salary_to"]), \
+                f"Salary to mismatch: {db_salary_to} != {job_data['salary_to']}"
+
+            # Verify status and description
+            assert db_status == job_data["status"], \
+                f"Status mismatch: {db_status} != {job_data['status']}"
+
+            assert db_description == job_data["description"], \
+                f"Description mismatch: {db_description} != {job_data['description']}"
+
+            print(f"✓ Verified job in database: {job_data['title']}")
+            return True
+
+        except AssertionError as ae:
+            print(f"❌ Verification failed: {str(ae)}")
+            raise
+        except Exception as e:
+            print(f"❌ Database verification error: {str(e)}")
+            raise
+
     def test_hr_create_job(self):
         """Test creating jobs"""
-        self.login('lan.nguyen', '123456')
+        self.login()
 
         # Calculate dates
         today = datetime.now()
@@ -83,6 +181,7 @@ class TestJob:
             {
                 "title": "Senior Backend Developer",
                 "department": "IT",
+                "position": "Frontend Developer",
                 "skills": ["Node.js", "Python", "PostgreSQL"],
                 "start_date": start_date,
                 "end_date": end_date,
@@ -98,6 +197,7 @@ class TestJob:
             {
                 "title": "Marketing Manager",
                 "department": "Marketing",
+                "position": "Business Executive",
                 "skills": ["Digital Marketing", "Content Strategy"],
                 "start_date": start_date,
                 "end_date": end_date,
@@ -116,7 +216,10 @@ class TestJob:
             try:
                 # Click Add Job button
                 self.page.click("text='Add Job'")
-
+                self.page.click("form div.ant-form-item:has(> div label:text('Department')) .ant-select-selector")
+                self.page.click(f"div[title='{job_data['department']}']")
+                self.page.click("[data-testid='select-job-position']")
+                self.page.click(f"div[title='{job_data['position']}']")
                 # Fill Job Title
                 self.page.fill("input[placeholder='Enter job title']", job_data["title"])
 
@@ -151,11 +254,11 @@ class TestJob:
 
                 # Add Benefits
                 # benefits_input = "#layout-multiple-horizontal_benefits .ant-select-selection-search-input"
-                benefits_input = "[data-testid='select-job-benefits'] .ant-select-selection-search-input"
-                for benefit in job_data["benefits"]:
-                    self.page.click(benefits_input, timeout=1000)  # Click để mở dropdown
-                    self.page.fill(benefits_input, benefit, timeout=1000)  # Fill giá trị
-                    self.page.keyboard.press("Enter")  # Press Enter để chọn
+                # benefits_input = "[data-testid='select-job-benefits'] .ant-select-selection-search-input"
+                # for benefit in job_data["benefits"]:
+                #     self.page.click(benefits_input, timeout=1000)  # Click để mở dropdown
+                #     self.page.fill(benefits_input, benefit, timeout=1000)  # Fill giá trị
+                #     self.page.keyboard.press("Enter")  # Press Enter để chọn
 
                 # Select Level
                 self.page.click("form div.ant-form-item:has(> div label:text('Level')) .ant-select-selector")
@@ -168,12 +271,9 @@ class TestJob:
                 self.page.click(f"div[title='{job_data['status']}']")
 
                 # Fill Working Address
-                self.page.fill("form div.ant-form-item:has(> div label:text('Address')) input",
-                               job_data["working_address"])
+                # self.page.fill("form div.ant-form-item:has(> div label:text('Address')) input",
+                #                job_data["working_address"])
 
-                # Select Department
-                self.page.click("form div.ant-form-item:has(> div label:text('Department')) .ant-select-selector")
-                self.page.click(f"div[title='{job_data['department']}']")
 
                 # Fill Description
                 self.page.fill("form div.ant-form-item:has(> div label:text('Description')) input",
@@ -196,6 +296,7 @@ class TestJob:
             # Create each job
             for job in job_data:
                 fill_job_form(job)
+                self.verify_job_in_db(job)
 
             print("\n🎉 All jobs created successfully 🎉")
 

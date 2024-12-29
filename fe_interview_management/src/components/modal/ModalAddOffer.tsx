@@ -179,7 +179,9 @@ export const ModalAddOffer = (props: any) => {
             className="w-1/2"
             rules={[{ required: true, message: "Please select a department" }]}
           >
-            <Select options={departmentOptions} onChange={(val) => handleChooseDepartment(val)} />
+            <Select
+              data-testid="select-offer-department"
+              options={departmentOptions} onChange={(val) => handleChooseDepartment(val)} />
           </Form.Item>
           <Form.Item
             name="candidate"
@@ -198,7 +200,7 @@ export const ModalAddOffer = (props: any) => {
             ]}
           >
             <Select
-              data-testid="select-position"
+              data-testid="select-offer-candidate"
               // options={department ? candidateOptions : []}
               options={filteredCandidates}
 

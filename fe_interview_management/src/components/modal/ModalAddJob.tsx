@@ -19,53 +19,53 @@ export const ModalAddJob = (props: any) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState(null)
   const [position, setPosition] = useState([]);
-const positionOptions = position.map((pos) => ({ label: pos, value: pos }));
+  const positionOptions = position.map((pos) => ({ label: pos, value: pos }));
 
-const handleChooseDepartment = (val) => {
-  setDepartment(val);
-};
-
-useEffect(() => {
-  const getPositions = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      const response = await fetch('http://103.56.158.135:8086/api/v1/request', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Thêm token vào header Authorization
-          'Accept': 'application/json' // Đảm bảo yêu cầu này trả về JSON
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch positions');
-      }
-
-      const responseData = await response.json();
-
-      // Lọc các vị trí có trạng thái "Approved"
-      const approvedPositions = responseData.data.results
-        .filter((val) => val.status === "Approved"  && val.department === department )
-        .map((val) => val.position);
-
-      // Cập nhật state position với danh sách đã lọc
-      setPosition(approvedPositions);
-    } catch (error) {
-      console.error('Error fetching positions:', error);
-    }
+  const handleChooseDepartment = (val) => {
+    setDepartment(val);
   };
 
-  if (department) {
-    getPositions(); // Chỉ gọi khi department có giá trị
-  }
-}, [department]);
+  useEffect(() => {
+    const getPositions = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-console.log("Position Options:", positionOptions);
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        const response = await fetch('http://103.56.158.135:8086/api/v1/request', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Thêm token vào header Authorization
+            'Accept': 'application/json' // Đảm bảo yêu cầu này trả về JSON
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch positions');
+        }
+
+        const responseData = await response.json();
+
+        // Lọc các vị trí có trạng thái "Approved"
+        const approvedPositions = responseData.data.results
+          .filter((val) => val.status === "Approved" && val.department === department)
+          .map((val) => val.position);
+
+        // Cập nhật state position với danh sách đã lọc
+        setPosition(approvedPositions);
+      } catch (error) {
+        console.error('Error fetching positions:', error);
+      }
+    };
+
+    if (department) {
+      getPositions(); // Chỉ gọi khi department có giá trị
+    }
+  }, [department]);
+
+  console.log("Position Options:", positionOptions);
 
 
   const selectAfter = (
@@ -131,7 +131,7 @@ console.log("Position Options:", positionOptions);
             className="w-1/2 mr-5"
             rules={[{ required: true, message: 'Please select department' }]}
           >
-            <Select options={departmentOptions} onChange = {(val) => handleChooseDepartment(val)}/>
+            <Select options={departmentOptions} onChange={(val) => handleChooseDepartment(val)} />
           </Form.Item>
           <Form.Item
             name="position"
@@ -139,8 +139,10 @@ console.log("Position Options:", positionOptions);
             className="w-1/2"
             rules={[{ required: true, message: 'Please enter position' }]}
           >
-           <Select options={positionOptions} />
-{console.log("Position Options:", positionOptions)}
+            <Select
+              data-testid="select-job-position"
+              options={positionOptions} />
+            {console.log("Position Options:", positionOptions)}
           </Form.Item>
         </div>
 

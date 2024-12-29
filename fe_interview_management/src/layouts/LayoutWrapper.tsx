@@ -78,8 +78,13 @@ function LayoutWrapper() {
       getItem(<Link to="/candidate">Candidate</Link>, '/candidate', <SearchOutlined />),
       getItem(<Link to="/job">Job</Link>, '/job', <CarryOutFilled />),
       getItem(<Link to="/interview">Interview</Link>, '/interview', <DingtalkOutlined />),
-      getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />),
+      // getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />),
     ];
+    if (role !== 'Interviewer') {
+      baseItems.push(
+        getItem(<Link to="/offer">Offer</Link>, '/offer', <SettingOutlined />)
+      );
+    }
 
     // Thêm Request menu cho role được phép
     if (role !== 'Interviewer') {

@@ -101,7 +101,7 @@ const GenericTable = <T extends {}>({
       columns={indexedColumns}
       dataSource={data}
       rowKey="id"
-      pagination={{ showSizeChanger: true, pageSizeOptions: ['5', '10', '15', '20'], defaultPageSize: 5 } as any}
+      pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '40', '50'], defaultPageSize: 10 } as any}
       onRow={(record, rowIndex) => {
         return {
           onClick: (event) => {

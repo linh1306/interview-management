@@ -86,6 +86,69 @@ class TestRequest:
         self.page.click(".ant-dropdown-trigger")
         self.page.click(".ant-dropdown-menu-item:last-child")
 
+    def verify_request_in_db(self, request_data):
+        """Verify request data in database"""
+        try:
+            verify_query = """
+                SELECT 
+                    position,
+                    quantity,
+                    start_date,
+                    end_date,
+                    workplace,
+                    level,
+                    description,
+                    status
+                FROM public."request"
+                WHERE position = %s
+                AND workplace = %s
+                AND level && %s  # Sử dụng && cho array intersection
+            """
+
+            self.cursor.execute(verify_query, (
+                request_data["position"],
+                request_data["workplace"],
+                request_data["level"]
+            ))
+
+            result = self.cursor.fetchone()
+            assert result is not None, f"Request for {request_data['position']} not found in database"
+
+            # Verify từng trường
+            db_position, db_quantity, db_start_date, db_end_date, db_workplace, db_level, db_description, db_status = result
+
+            assert db_position == request_data[
+                "position"], f"Position mismatch: {db_position} != {request_data['position']}"
+            assert int(db_quantity) == int(
+                request_data["quantity"]), f"Quantity mismatch: {db_quantity} != {request_data['quantity']}"
+            assert str(db_workplace) == request_data[
+                "workplace"], f"Workplace mismatch: {db_workplace} != {request_data['workplace']}"
+
+            # Convert and compare dates
+            expected_start = datetime.strptime(request_data["start_date"], '%d/%m/%Y').date()
+            expected_end = datetime.strptime(request_data["end_date"], '%d/%m/%Y').date()
+            assert db_start_date == expected_start, f"Start date mismatch: {db_start_date} != {expected_start}"
+            assert db_end_date == expected_end, f"End date mismatch: {db_end_date} != {expected_end}"
+
+            # Verify level array contains all required levels
+            for level in request_data["level"]:
+                assert level in db_level, f"Level {level} not found in {db_level}"
+
+            # Verify description if provided
+            if "description" in request_data:
+                assert db_description == request_data[
+                    "description"], f"Description mismatch: {db_description} != {request_data['description']}"
+
+            print(f"✓ Verified request in database: {request_data['position']}")
+            return True
+
+        except AssertionError as ae:
+            print(f"❌ Verification failed: {str(ae)}")
+            raise
+        except Exception as e:
+            print(f"❌ Database verification error: {str(e)}")
+            raise
+
     def test_od_create_request(self):
         """Test creating recruitment requests"""
         self.login('itmanager', '123456')
@@ -172,6 +235,7 @@ class TestRequest:
             # Create each request
             for request_data in test_requests:
                 fill_request_form(request_data)
+                self.verify_request_in_db(request_data)
 
             print("\n🎉 All recruitment requests created successfully 🎉")
 

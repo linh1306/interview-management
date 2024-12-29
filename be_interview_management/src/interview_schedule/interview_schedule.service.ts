@@ -38,41 +38,52 @@ export class InterviewScheduleService extends BaseService<InterviewSchedule> {
         });
     }
 
-    findAll(query: ListDto, user: User) {
-        if ([UserRole.Interviewer, UserRole.Manager].includes(user.role)) {
-            return this.repository
-                .createQueryBuilder('interview')
-                .leftJoinAndSelect('interview.job', 'job')
-                .leftJoinAndSelect('interview.interviewers', 'interviewers')
-                .leftJoinAndSelect('interview.candidate', 'candidate')
-                .where('job.department::text = :department::text', {department: user.department})
-                .andWhere((qb) => {
-                    const subQuery = qb
-                        .subQuery()
-                        .select('is.interview_schedule_id')
-                        .from('interviewer_schedule', 'is')
-                        .innerJoin('user', 'u', 'u.id = is.interview_id')
-                        .where('u.department::text = :department::text', {department: user.department})
-                        .getQuery();
-                    return 'interview.id IN ' + subQuery;
-                })
-                .getMany();
-        }
+    async findAll(query: ListDto, user: User) {
+    if ([UserRole.Interviewer, UserRole.Manager].includes(user.role)) {
+        const [interviews, total] = await this.repository
+            .createQueryBuilder('interview')
+            .leftJoinAndSelect('interview.job', 'job')
+            .leftJoinAndSelect('interview.interviewers', 'interviewers')
+            .leftJoinAndSelect('interview.candidate', 'candidate')
+            .where('job.department::text = :department::text', {department: user.department})
+            .andWhere((qb) => {
+                const subQuery = qb
+                    .subQuery()
+                    .select('is.interview_schedule_id')
+                    .from('interviewer_schedule', 'is')
+                    .innerJoin('user', 'u', 'u.id = is.interview_id')
+                    .where('u.department::text = :department::text', {department: user.department})
+                    .getQuery();
+                return 'interview.id IN ' + subQuery;
+            })
+            .getManyAndCount();
 
-        const config: PaginateConfig<InterviewSchedule> = {
-            sortableColumns: ['last_modified_date'],
-            defaultSortBy: [['last_modified_date', 'DESC']],
-            relations: {job: true, interviewers: true, candidate: true},
-            searchableColumns: [
-                'candidate.full_name',
-                'candidate.email',
-                'job.title',
-                'title',
-            ],
+        return {
+                results: interviews,
+                metadata: {
+                    itemsPerPage: query.limit || 10,
+                    totalItems: total,
+                    currentPage: query.page || 1,
+                    totalPages: Math.ceil(total / (query.limit || 10)),
+                    sortBy: [['last_modified_date', 'DESC']]
+            }
         };
-
-        return this.listWithPage(query, config);
     }
+
+    const config: PaginateConfig<InterviewSchedule> = {
+        sortableColumns: ['last_modified_date'],
+        defaultSortBy: [['last_modified_date', 'DESC']],
+        relations: {job: true, interviewers: true, candidate: true},
+        searchableColumns: [
+            'candidate.full_name',
+            'candidate.email',
+            'job.title',
+            'title',
+        ],
+    };
+
+    return this.listWithPage(query, config);
+}
 
     findOne(id: number) {
         return this.repository.findOne({where: {id}});

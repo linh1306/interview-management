@@ -66,7 +66,7 @@ export interface PaginateConfig<T> {
 }
 
 export const DEFAULT_MAX_LIMIT = 10000;
-export const DEFAULT_LIMIT = 20;
+export const DEFAULT_LIMIT = 2000;
 export const NO_PAGINATION = 0;
 
 export async function paginate<T extends ObjectLiteral>(

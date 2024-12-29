@@ -6,6 +6,7 @@ import { JobLevel, JobStatus, UserDepartment } from "@/configs/constants.tsx";
 import { Skill } from "@/interfaces/job.interface.ts";
 import { createJob, getJobs, updateJob } from "@/redux/features/jobSlice.ts";
 import moment from "moment";
+import dayjs from "dayjs";
 const statusOptions = Object.entries(JobStatus).map(([key, value]) => ({ label: value, value: key }));
 const jobLevelOptions = Object.entries(JobLevel).map(([key, value]) => ({ label: value, value: key }));
 export const ModalAddJob = (props: any) => {
@@ -19,11 +20,30 @@ export const ModalAddJob = (props: any) => {
   const [form] = Form.useForm();
   const [department, setDepartment] = useState(null)
   const [position, setPosition] = useState([]);
-const positionOptions = position.map((pos) => ({ label: pos, value: pos }));
+  const positionOptions = position.filter((val) => val.status === "Approved" && val.department === department).map((val) => ({
+    label: val.position + "-RQ" + val.id,
+    value: val.position + "-RQ" + val.id,
+  }));
 
 const handleChooseDepartment = (val) => {
   setDepartment(val);
 };
+
+  const handleChoosePosition = (val) => {
+    const result = val.match(/RQ(\d+)/);
+
+    if (result) {
+      const id = parseInt(result[1], 10);
+      const req = position.find((item) => item.id === id);
+
+      form.setFieldsValue({
+        level: req.level,
+        start_date: dayjs(req.start_date),
+        end_date: dayjs(req.end_date),
+        status: req.status,
+      });
+    }
+  };
 
 useEffect(() => {
   const getPositions = async () => {
@@ -50,9 +70,6 @@ useEffect(() => {
 
       // Lọc các vị trí có trạng thái "Approved"
       const approvedPositions = responseData.data.results
-        .filter((val) => val.status === "Approved"  && val.department === department )
-        .map((val) => val.position);
-
       // Cập nhật state position với danh sách đã lọc
       setPosition(approvedPositions);
     } catch (error) {
@@ -139,7 +156,10 @@ console.log("Position Options:", positionOptions);
             className="w-1/2"
             rules={[{ required: true, message: 'Please enter position' }]}
           >
-           <Select options={positionOptions} />
+           <Select
+              options={positionOptions}
+              onChange={(val) => handleChoosePosition(val)}
+            />
 {console.log("Position Options:", positionOptions)}
           </Form.Item>
         </div>

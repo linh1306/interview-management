@@ -70,9 +70,7 @@ export const ModalAddInterview = (props: any) => {
 
 
   const jobOptions = useMemo(() => {
-    console.log('All jobs:', jobs);
     const filteredJobs = jobs.filter(job => job.status === 'Open');
-    console.log('Open jobs:', filteredJobs);
 
     return filteredJobs.map((job) => ({
       label: job.title,
@@ -153,9 +151,6 @@ export const ModalAddInterview = (props: any) => {
   };
 
 
-  console.log('candidates: ', candidates);
-  console.log('jobs: ', jobs);
-  console.log('users: ', users)
   return (
     <Modal
       title={initialValues ? "EDIT INTERVIEW SCHEDULE" : "ADD INTERVIEW SCHEDULE"}

@@ -62,7 +62,14 @@ export const InterviewPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { role } = useAuth();
   const dispatch = useAppDispatch();
-  const interviews = useAppSelector((state) => state.interview.interviews);
+  const interviews = useAppSelector((state) => {
+    console.log('Current interviews state:', state.interview);
+    return state.interview.interviews;
+  });
+  useEffect(() => {
+    console.log('Interviews data changed:', interviews);
+  }, [interviews]);
+
   useEffect(() => {
     dispatch(getJobs(undefined));
     dispatch(getCandidates(undefined));
@@ -76,9 +83,12 @@ export const InterviewPage = () => {
 
   useEffect(() => {
     // Call API when status changes with filter
+    console.log('Selected status changed:', selectedStatus);
     if (selectedStatus) {
+      console.log('Dispatching getInterviews with filter:', { status: selectedStatus });
       dispatch(getInterviews({ filter: JSON.stringify({ status: selectedStatus }) }));
     } else {
+      console.log('Dispatching getInterviews without filter');
       dispatch(getInterviews(undefined));
     }
   }, [selectedStatus]);
@@ -89,7 +99,6 @@ export const InterviewPage = () => {
   }
   const handleDelete = async (record) => {
     try {
-      console.log("Deleting record:", record); // Log để debug
 
       const response = await axios.delete(`http://103.56.158.135:8086/api/v1/interview-schedule/${record.id}`, {
         headers: {
@@ -97,7 +106,6 @@ export const InterviewPage = () => {
         }
       });
 
-      console.log("Delete response:", response); // Log response
 
       if (response.status === 200) {
         message.success('Deleted successfully');
@@ -105,7 +113,6 @@ export const InterviewPage = () => {
         dispatch(getInterviews(undefined));
       }
     } catch (error) {
-      console.error('Error deleting interview:', error);
       message.error(error.response?.data?.message || 'Failed to delete interview');
     }
   };
